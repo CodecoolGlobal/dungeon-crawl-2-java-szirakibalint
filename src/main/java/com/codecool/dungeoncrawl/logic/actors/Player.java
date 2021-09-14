@@ -19,4 +19,11 @@ public class Player extends Actor {
             super.move(dx, dy);
         }
     }
+
+    public void pickUpItem() {
+        Cell cell = this.cell;
+        if (cell.getItem() != null) {
+            cell.setItem(null);
+        }
+    }
 }
