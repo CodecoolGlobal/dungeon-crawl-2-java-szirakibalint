@@ -27,7 +27,7 @@ public class Skeleton extends Enemy {
         Cell nextCell = this.cell.getNeighbor(dx, dy);
         if (nextCell.getActor() == null
                 && nextCell.getType() != CellType.WALL
-                // && nextCell.getItem() == null
+                && nextCell.getItem() == null
         ) {
             super.move(dx, dy);
         }
