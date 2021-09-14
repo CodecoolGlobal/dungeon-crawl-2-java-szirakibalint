@@ -21,6 +21,9 @@ public class Player extends Actor {
 
         if (nextCell.getActor() instanceof Enemy){
             attack(nextCell.getActor());
+            if (nextCell.getActor() != null){
+                nextCell.getActor().attack(this);
+            }
         }
     }
 

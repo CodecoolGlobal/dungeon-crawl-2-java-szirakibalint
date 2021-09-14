@@ -47,7 +47,7 @@ public abstract class Actor implements Drawable {
     }
 
     protected int calculateAttack(){
-        return 1;
+        return 2;
     }
 
     public void attack(Actor actor){
