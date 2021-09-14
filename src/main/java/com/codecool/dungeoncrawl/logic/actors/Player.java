@@ -18,5 +18,17 @@ public class Player extends Actor {
         if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL) {
             super.move(dx, dy);
         }
+
+        if (nextCell.getActor() instanceof Enemy){
+            attack(nextCell.getActor());
+        }
     }
+
+    @Override
+    protected int calculateAttack(){
+        return 5;
+    }
+
+
+
 }

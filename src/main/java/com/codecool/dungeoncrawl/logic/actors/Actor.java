@@ -1,7 +1,6 @@
 package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
-import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.Drawable;
 
 public abstract class Actor implements Drawable {
@@ -34,5 +33,26 @@ public abstract class Actor implements Drawable {
 
     public int getY() {
         return cell.getY();
+    }
+
+    public void loseHealth(int healthChange){
+        this.health -= healthChange;
+        if (health<=0){
+            this.cell.setActor(null);
+        }
+    }
+
+    public int calculateDamage(int attack){
+        return attack;
+    }
+
+    protected int calculateAttack(){
+        return 1;
+    }
+
+    public void attack(Actor actor){
+        int attack = calculateAttack();
+        actor.calculateDamage(attack);
+        actor.loseHealth(attack);
     }
 }
