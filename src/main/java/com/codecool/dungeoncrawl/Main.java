@@ -54,25 +54,33 @@ public class Main extends Application {
         switch (keyEvent.getCode()) {
             case UP:
                 map.getPlayer().move(0, -1);
+                enemyTurn();
                 refresh();
                 break;
             case DOWN:
                 map.getPlayer().move(0, 1);
+                enemyTurn();
                 refresh();
                 break;
             case LEFT:
                 map.getPlayer().move(-1, 0);
+                enemyTurn();
                 refresh();
                 break;
             case RIGHT:
                 map.getPlayer().move(1,0);
+                enemyTurn();
                 refresh();
                 break;
         }
+
+    }
+
+    private void enemyTurn(){
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 Cell cell = map.getCell(x, y);
-                if (cell.getActor() != null) {
+                if (cell.getActor() != null && cell.getActor() != map.getPlayer()) {
                     cell.getActor().act();
                 }
             }

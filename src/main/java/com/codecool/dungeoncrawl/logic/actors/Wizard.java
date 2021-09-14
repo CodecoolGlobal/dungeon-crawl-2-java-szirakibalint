@@ -42,18 +42,25 @@ public class Wizard extends Enemy{
 
    @Override
     public void act(){
+        boolean attacked = false;
         for (int dx = -2; dx < 3; dx++) {
             for (int dy = -2; dy < 3; dy++){
                 if ((dy == 0 )|| (dx == 0) || (Math.abs(dx) == Math.abs(dy))){
-                    Actor actor = cell.getNeighbor(dx, dy).getActor();
+                    Cell neighborCell = cell.getNeighbor(dx, dy);
+                    Actor actor = null;
+                    if (neighborCell != null) {
+                        actor = neighborCell.getActor();
+                    }
                     if (actor instanceof Player){
                         attack(actor);
-                    } else {
-                        int[] move = getNextMove();
-                        move(move[0], move[1]);
+                        attacked = true;
                     }
                 }
             }
+        }
+        if (!attacked){
+                int[] move = getNextMove();
+                move(move[0], move[1]);
         }
 
     }
