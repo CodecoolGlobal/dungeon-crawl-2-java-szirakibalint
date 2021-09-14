@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.StringJoiner;
 
 public class Inventory {
-    ArrayList<Item> inventory;
+    private ArrayList<Item> inventory;
 
     public Inventory() {
         inventory = new ArrayList<>();
