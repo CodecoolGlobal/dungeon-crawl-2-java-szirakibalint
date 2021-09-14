@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
+import com.codecool.dungeoncrawl.logic.actors.Player;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -24,6 +25,7 @@ public class Main extends Application {
             map.getHeight() * Tiles.TILE_WIDTH);
     GraphicsContext context = canvas.getGraphicsContext2D();
     Label healthLabel = new Label();
+    Label inventoryLabel = new Label("Inventory is empty");
     Button pickUpButton = new Button("Pick up");
 
     public static void main(String[] args) {
@@ -42,7 +44,8 @@ public class Main extends Application {
 
         ui.add(new Label("Health: "), 0, 0);
         ui.add(healthLabel, 1, 0);
-        ui.add(pickUpButton, 2, 1);
+        ui.add(pickUpButton, 0, 1);
+        ui.add(inventoryLabel, 0, 2);
 
         BorderPane borderPane = new BorderPane();
 
@@ -82,7 +85,8 @@ public class Main extends Application {
 
     private void setPickUpButtonClickEvent() {
         pickUpButton.setOnAction(e -> {
-            map.getPlayer().pickUpItem();
+            Player player = map.getPlayer();
+            player.pickUpItem();
         });
     }
 
