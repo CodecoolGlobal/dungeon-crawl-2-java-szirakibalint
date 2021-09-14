@@ -55,4 +55,8 @@ public abstract class Actor implements Drawable {
         actor.calculateDamage(attack);
         actor.loseHealth(attack);
     }
+
+    public void act(){
+
+    }
 }
