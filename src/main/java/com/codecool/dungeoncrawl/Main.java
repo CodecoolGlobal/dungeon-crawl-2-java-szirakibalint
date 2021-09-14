@@ -87,6 +87,7 @@ public class Main extends Application {
         pickUpButton.setOnAction(e -> {
             Player player = map.getPlayer();
             player.pickUpItem();
+            inventoryLabel.setText(player.getInventory().toString());
         });
     }
 
