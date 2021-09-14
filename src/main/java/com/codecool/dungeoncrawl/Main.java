@@ -34,9 +34,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         canvas.setFocusTraversable(false);
         pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
-        pickUpButton.setOnAction(e -> {
-            // TODO handle click event
-        });
+        setPickUpButtonClickEvent();
 
         GridPane ui = new GridPane();
         ui.setPrefWidth(200);
@@ -80,6 +78,12 @@ public class Main extends Application {
                 refresh();
                 break;
         }
+    }
+
+    private void setPickUpButtonClickEvent() {
+        pickUpButton.setOnAction(e -> {
+            map.getPlayer().pickUpItem();
+        });
     }
 
     private void refresh() {
