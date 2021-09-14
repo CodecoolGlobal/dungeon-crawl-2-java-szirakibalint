@@ -19,12 +19,14 @@ public class Wizard extends Enemy{
     public int[] getNextMove(){
 
         int d = (int) Math.signum(0.5  - Math.random());
-
+        int[] move;
         if (movementDirection == 'h'){
-            return new int[]{d, 0};
+            move = new int[]{d, 0};
         } else {
-            return new int[]{0, d};
+            move = new int[]{0, d};
         }
+        movementDirection = (movementDirection == 'h' ? 'v' : 'h');
+        return move;
     }
 
     @Override
