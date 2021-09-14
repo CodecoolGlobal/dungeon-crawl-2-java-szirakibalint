@@ -8,6 +8,11 @@ public class Wizard extends Enemy{
         super(cell);
     }
 
+    @Override
+    public String getTileName() {
+        return "wizard";
+    }
+
     public void act(){
         for (int dx = -2; dx < 3; dx++) {
             for (int dy = -2; dy < 3; dy++){
@@ -19,5 +24,6 @@ public class Wizard extends Enemy{
                 }
             }
         }
+
     }
 }
