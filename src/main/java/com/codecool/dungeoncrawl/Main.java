@@ -104,6 +104,7 @@ public class Main extends Application {
             Player player = map.getPlayer();
             player.pickUpItem();
             inventoryLabel.setText(player.getInventory().toString());
+            refresh();
         });
     }
 
