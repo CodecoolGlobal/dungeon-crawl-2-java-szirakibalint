@@ -3,12 +3,11 @@ package com.codecool.dungeoncrawl.logic.actors;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.items.Item;
-import com.codecool.dungeoncrawl.logic.items.Key;
-
-import java.util.ArrayList;
+import com.codecool.dungeoncrawl.logic.util.Inventory;
 
 public class Player extends Actor {
-    ArrayList<Item> items = new ArrayList<>();
+    private final Inventory inventory = new Inventory();
+
     public Player(Cell cell) {
         super(cell);
     }
@@ -20,38 +19,21 @@ public class Player extends Actor {
     @Override
     public void move(int dx, int dy){
         Cell nextCell = this.cell.getNeighbor(dx, dy);
-        if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL && (nextCell.getType() != CellType.CLOSEDDOOR || hasKey())) {
-            if (nextCell.getType() != CellType.CLOSEDDOOR) {
-                useKey();
-            }
-            if (nextCell.getItem().getTileName() == "key") {
-                items.add(nextCell.getItem());
-            }
+        if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL) {
             super.move(dx, dy);
-        }
-    }
-
-    public boolean hasKey() {
-        for (Item elem : items) {
-            if (elem instanceof Key) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void useKey() {
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i) instanceof Key) {
-                items.remove(i);
-            }
         }
     }
 
     public void pickUpItem() {
         Cell cell = this.cell;
-        if (cell.getItem() != null) {
+        Item item = cell.getItem();
+        if (item != null) {
             cell.setItem(null);
+            inventory.add(item);
         }
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 }
