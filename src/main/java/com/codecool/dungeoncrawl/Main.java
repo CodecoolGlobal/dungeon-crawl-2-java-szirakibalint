@@ -62,7 +62,7 @@ public class Main extends Application {
         refresh();
         scene.setOnKeyPressed(this::onKeyPressed);
 
-        primaryStage.setTitle("Dungeon Crawl");
+        primaryStage.setTitle("Private Static Final Fantasy");
         primaryStage.show();
         canvas.requestFocus();
     }
@@ -109,6 +109,7 @@ public class Main extends Application {
             Player player = map.getPlayer();
             player.pickUpItem();
             inventoryLabel.setText(player.getInventory().toString());
+            refresh();
         });
     }
 
