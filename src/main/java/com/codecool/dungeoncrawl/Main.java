@@ -19,7 +19,7 @@ import javafx.scene.control.Button;
 
 
 public class Main extends Application {
-    GameMap map = MapLoader.loadMap();
+    static GameMap map = MapLoader.loadMap("/map.txt");
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -30,6 +30,11 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static void loadLevel(String levelMap){
+        map = MapLoader.loadMap(levelMap);
+
     }
 
     @Override
@@ -57,7 +62,7 @@ public class Main extends Application {
         refresh();
         scene.setOnKeyPressed(this::onKeyPressed);
 
-        primaryStage.setTitle("Dungeon Crawl");
+        primaryStage.setTitle("Private Static Final Fantasy");
         primaryStage.show();
         canvas.requestFocus();
     }
@@ -66,20 +71,36 @@ public class Main extends Application {
         switch (keyEvent.getCode()) {
             case UP:
                 map.getPlayer().move(0, -1);
+                enemyTurn();
                 refresh();
                 break;
             case DOWN:
                 map.getPlayer().move(0, 1);
+                enemyTurn();
                 refresh();
                 break;
             case LEFT:
                 map.getPlayer().move(-1, 0);
+                enemyTurn();
                 refresh();
                 break;
             case RIGHT:
                 map.getPlayer().move(1,0);
+                enemyTurn();
                 refresh();
                 break;
+        }
+
+    }
+
+    private void enemyTurn(){
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < map.getHeight(); y++) {
+                Cell cell = map.getCell(x, y);
+                if (cell.getActor() != null && cell.getActor() != map.getPlayer()) {
+                    cell.getActor().act();
+                }
+            }
         }
     }
 
@@ -88,6 +109,7 @@ public class Main extends Application {
             Player player = map.getPlayer();
             player.pickUpItem();
             inventoryLabel.setText(player.getInventory().toString());
+            refresh();
         });
     }
 

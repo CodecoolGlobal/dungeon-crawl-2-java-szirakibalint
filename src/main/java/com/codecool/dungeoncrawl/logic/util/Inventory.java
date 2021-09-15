@@ -34,6 +34,10 @@ public class Inventory {
         return false;
     }
 
+    public ArrayList<Item> getContent(){
+        return inventory;
+    }
+
     @Override
     public String toString() {
         if (inventory.size() == 0) {
