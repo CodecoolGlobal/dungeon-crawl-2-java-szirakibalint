@@ -9,6 +9,11 @@ public class Wizard extends Enemy{
 
     public Wizard(Cell cell) {
         super(cell);
+        this.health = 7;
+    }
+
+    protected int calculateAttack(){
+        return 3;
     }
 
     @Override
