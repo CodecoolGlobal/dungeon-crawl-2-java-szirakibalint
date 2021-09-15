@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
+import com.codecool.dungeoncrawl.logic.actors.Player;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -14,6 +15,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.scene.control.Button;
+
 
 public class Main extends Application {
     GameMap map = MapLoader.loadMap();
@@ -22,6 +25,8 @@ public class Main extends Application {
             map.getHeight() * Tiles.TILE_WIDTH);
     GraphicsContext context = canvas.getGraphicsContext2D();
     Label healthLabel = new Label();
+    Label inventoryLabel = new Label("Inventory is empty");
+    Button pickUpButton = new Button("Pick up");
 
     public static void main(String[] args) {
         launch(args);
@@ -29,12 +34,18 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        canvas.setFocusTraversable(false);
+        pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
+        setPickUpButtonClickEvent();
+
         GridPane ui = new GridPane();
         ui.setPrefWidth(200);
         ui.setPadding(new Insets(10));
 
         ui.add(new Label("Health: "), 0, 0);
         ui.add(healthLabel, 1, 0);
+        ui.add(pickUpButton, 0, 1);
+        ui.add(inventoryLabel, 0, 2);
 
         BorderPane borderPane = new BorderPane();
 
@@ -48,6 +59,7 @@ public class Main extends Application {
 
         primaryStage.setTitle("Dungeon Crawl");
         primaryStage.show();
+        canvas.requestFocus();
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
@@ -85,6 +97,14 @@ public class Main extends Application {
                 }
             }
         }
+    }
+
+    private void setPickUpButtonClickEvent() {
+        pickUpButton.setOnAction(e -> {
+            Player player = map.getPlayer();
+            player.pickUpItem();
+            inventoryLabel.setText(player.getInventory().toString());
+        });
     }
 
     private void refresh() {

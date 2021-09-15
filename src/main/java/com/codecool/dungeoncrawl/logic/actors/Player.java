@@ -2,8 +2,12 @@ package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
+import com.codecool.dungeoncrawl.logic.items.Item;
+import com.codecool.dungeoncrawl.logic.util.Inventory;
 
 public class Player extends Actor {
+    private final Inventory inventory = new Inventory();
+
     public Player(Cell cell) {
         super(cell);
     }
@@ -34,4 +38,17 @@ public class Player extends Actor {
 
 
 
+
+    public void pickUpItem() {
+        Cell cell = this.cell;
+        Item item = cell.getItem();
+        if (item != null) {
+            cell.setItem(null);
+            inventory.add(item);
+        }
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
 }
