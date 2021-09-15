@@ -17,7 +17,7 @@ public class Inventory {
 
     public boolean hasKey() {
         for (int i = 0; i < inventory.size(); i++) {
-            if (inventory.get(i).getTileName() == "key") {
+            if (inventory.get(i).getTileName().equals("key")) {
                 return true;
             }
         }
@@ -26,7 +26,7 @@ public class Inventory {
 
     public boolean useKey() {
         for (int i = 0; i < inventory.size(); i++) {
-            if (inventory.get(i).getTileName() == "key") {
+            if (inventory.get(i).getTileName().equals("key")) {
                 inventory.remove(i);
                 return true;
             }
