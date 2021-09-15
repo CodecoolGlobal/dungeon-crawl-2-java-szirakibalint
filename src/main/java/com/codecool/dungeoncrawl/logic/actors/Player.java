@@ -31,10 +31,9 @@ public class Player extends Actor {
                     nextCell.setType(CellType.OPENDOOR);
                 }
             }
-        } else if (nextCell.getType() == CellType.STAIRSDOWN) {
-            Main.loadLevel("/map2.txt");
-        } else if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL) {
             super.move(dx, dy);
+        } if (nextCell.getType() == CellType.STAIRSDOWN) {
+            Main.loadLevel("/map2.txt");
         } else if (nextCell.getActor() instanceof Enemy){
             attack(nextCell.getActor());
             if (nextCell.getActor() != null){
