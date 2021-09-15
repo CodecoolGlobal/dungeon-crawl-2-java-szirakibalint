@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 public class MapLoader {
+
+
     public static GameMap loadMap(String fileName) {
         InputStream is = MapLoader.class.getResourceAsStream(fileName);
         assert is != null;
