@@ -10,4 +10,9 @@ public abstract class Item implements Drawable {
         this.cell = cell;
         this.cell.setItem(this);
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }
