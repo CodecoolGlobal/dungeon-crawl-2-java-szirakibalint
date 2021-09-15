@@ -15,6 +15,10 @@ public class Inventory {
         inventory.add(item);
     }
 
+    public ArrayList<Item> getContent(){
+        return inventory;
+    }
+
     @Override
     public String toString() {
         if (inventory.size() == 0) {

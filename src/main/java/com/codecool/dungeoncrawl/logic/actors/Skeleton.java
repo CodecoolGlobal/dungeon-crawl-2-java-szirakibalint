@@ -6,7 +6,7 @@ import com.codecool.dungeoncrawl.logic.CellType;
 public class Skeleton extends Enemy {
     public Skeleton(Cell cell) {
         super(cell);
-        this.health = 8;
+        this.health = 6;
     }
 
     @Override
