@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Player extends Actor {
     private final Inventory inventory = new Inventory();
+    private boolean hasSword = false;
 
     public Player(Cell cell) {
         super(cell);
@@ -46,19 +47,21 @@ public class Player extends Actor {
         return attack;
     }
 
-
-
-
     public void pickUpItem() {
         Cell cell = this.cell;
         Item item = cell.getItem();
         if (item != null) {
             cell.setItem(null);
             inventory.add(item);
+            if (item instanceof Sword) hasSword = true;
         }
     }
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public boolean hasSword() {
+        return hasSword;
     }
 }
