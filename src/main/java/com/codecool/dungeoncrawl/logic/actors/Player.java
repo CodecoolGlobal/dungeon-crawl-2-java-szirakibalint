@@ -19,7 +19,14 @@ public class Player extends Actor {
     @Override
     public void move(int dx, int dy){
         Cell nextCell = this.cell.getNeighbor(dx, dy);
-        if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL) {
+        if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL && (nextCell.getType() != CellType.CLOSEDDOOR || inventory.hasKey())) {
+            if (nextCell.getType() == CellType.CLOSEDDOOR) {
+                System.out.println(inventory);
+                if (inventory.useKey()) {
+                    System.out.println(inventory);
+                    nextCell.setType(CellType.OPENDOOR);
+                }
+            }
             super.move(dx, dy);
         }
     }
