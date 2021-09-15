@@ -15,6 +15,25 @@ public class Inventory {
         inventory.add(item);
     }
 
+    public boolean hasKey() {
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.get(i).getTileName().equals("key")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean useKey() {
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.get(i).getTileName().equals("key")) {
+                inventory.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public ArrayList<Item> getContent(){
         return inventory;
     }

@@ -25,22 +25,24 @@ public class Player extends Actor {
     @Override
     public void move(int dx, int dy){
         Cell nextCell = this.cell.getNeighbor(dx, dy);
-
-        if (nextCell.getType() == CellType.STAIRSDOWN){
+        if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL && (nextCell.getType() != CellType.CLOSEDDOOR || inventory.hasKey())) {
+            if (nextCell.getType() == CellType.CLOSEDDOOR) {
+                if (inventory.useKey()) {
+                    nextCell.setType(CellType.OPENDOOR);
+                }
+            }
+        } else if (nextCell.getType() == CellType.STAIRSDOWN) {
             Main.loadLevel("/map2.txt");
         } else if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL) {
             super.move(dx, dy);
-        }
-
-        if (nextCell.getActor() instanceof Enemy){
+        } else if (nextCell.getActor() instanceof Enemy){
             attack(nextCell.getActor());
             if (nextCell.getActor() != null){
                 nextCell.getActor().attack(this);
             }
         }
-
-
     }
+
 
     @Override
     protected int calculateAttack(){
