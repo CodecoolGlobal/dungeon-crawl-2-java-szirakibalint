@@ -19,7 +19,7 @@ import javafx.scene.control.Button;
 
 
 public class Main extends Application {
-    GameMap map = MapLoader.loadMap();
+    static GameMap map = MapLoader.loadMap("/map.txt");
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -30,6 +30,11 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static void loadLevel(String levelMap){
+        map = MapLoader.loadMap(levelMap);
+
     }
 
     @Override

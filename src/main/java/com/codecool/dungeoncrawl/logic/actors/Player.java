@@ -1,5 +1,6 @@
 package com.codecool.dungeoncrawl.logic.actors;
 
+import com.codecool.dungeoncrawl.Main;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.items.Item;
@@ -22,7 +23,10 @@ public class Player extends Actor {
     @Override
     public void move(int dx, int dy){
         Cell nextCell = this.cell.getNeighbor(dx, dy);
-        if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL) {
+
+        if (nextCell.getType() == CellType.STAIRSDOWN){
+            Main.loadLevel("/map2.txt");
+        } else if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL) {
             super.move(dx, dy);
         }
 
@@ -32,6 +36,8 @@ public class Player extends Actor {
                 nextCell.getActor().attack(this);
             }
         }
+
+
     }
 
     @Override
