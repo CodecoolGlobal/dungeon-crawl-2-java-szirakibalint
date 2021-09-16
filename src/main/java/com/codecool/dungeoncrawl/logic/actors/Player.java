@@ -12,9 +12,11 @@ import java.util.List;
 public class Player extends Actor {
     private final Inventory inventory = new Inventory();
     private boolean hasSword = false;
+    protected boolean isAlive;
 
     public Player(Cell cell) {
         super(cell);
+        isAlive = true;
     }
 
     @Override
@@ -40,8 +42,8 @@ public class Player extends Actor {
                 nextCell.getActor().attack(this);
             }
         }
+        isAlive = checkIsAlive();
     }
-
 
     @Override
     protected int calculateAttack(){
@@ -71,5 +73,9 @@ public class Player extends Actor {
 
     public boolean hasSword() {
         return hasSword;
+    }
+
+    public boolean checkIsAlive() {
+        return (this.getHealth() > 0);
     }
 }
