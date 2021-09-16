@@ -21,7 +21,7 @@ public class Player extends Actor {
 
     @Override
     public String getTileName() {
-        return hasSword ? "playerwithsword" : "player";
+        return isAlive ? (hasSword ? "playerwithsword" : "player") : "ghost";
     }
 
     @Override
