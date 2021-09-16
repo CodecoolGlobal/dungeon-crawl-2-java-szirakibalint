@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.Drawable;
 
 public abstract class Actor implements Drawable {
@@ -17,6 +18,10 @@ public abstract class Actor implements Drawable {
         cell.setActor(null);
         nextCell.setActor(this);
         cell = nextCell;
+        if ((cell.getType() == CellType.HEARTONFLOOR) && (this instanceof Player)) {
+            health = health > 0 ? health + 10 : 10;
+            this.cell.setType(CellType.FLOOR);
+        }
     }
 
     public int getHealth() {
