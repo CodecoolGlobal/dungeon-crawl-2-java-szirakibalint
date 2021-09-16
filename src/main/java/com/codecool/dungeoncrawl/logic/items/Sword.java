@@ -7,6 +7,7 @@ public class Sword extends Item {
 
     public Sword(Cell cell) {
         super(cell);
+        super.setName("Sword");
     }
 
     @Override
