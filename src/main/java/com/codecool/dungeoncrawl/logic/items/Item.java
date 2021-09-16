@@ -19,6 +19,6 @@ public abstract class Item implements Drawable {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName();
+        return this.name;
     }
 }
