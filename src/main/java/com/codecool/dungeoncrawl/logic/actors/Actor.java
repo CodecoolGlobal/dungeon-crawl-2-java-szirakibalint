@@ -66,4 +66,8 @@ public abstract class Actor implements Drawable {
     public void act(){
 
     }
+
+    public void setCell(Cell cell){
+        this.cell = cell;
+    };
 }

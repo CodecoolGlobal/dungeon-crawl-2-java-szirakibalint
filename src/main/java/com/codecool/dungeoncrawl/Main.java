@@ -39,7 +39,13 @@ public class Main extends Application {
     }
 
     public static void loadLevel(String levelMap){
+        Player player = map.getPlayer();
         map = MapLoader.loadMap(levelMap);
+        Cell playerCell = map.getPlayer().getCell();
+        playerCell.setActor(player);
+        map.setPlayer(player);
+        player.setCell(playerCell);
+
     }
 
     @Override
