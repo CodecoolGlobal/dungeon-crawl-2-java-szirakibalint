@@ -21,6 +21,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -132,17 +133,20 @@ public class Main extends Application {
     private void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
         saveButton.setOnAction(e -> {
             String enteredName = nameField.getText();
-            System.out.println(createOverwriteAlert(enteredName));
+//            TODO: replace with dbManager usage
 //            List<PlayerModel> players = dbManager.getAllPlayers();
-//            createOverwriteAlert(enteredName);
-//            boolean alreadyExists = false;
-//            for (PlayerModel player: players) {
-//                if (enteredName.equals(player.getPlayerName())) {
-//                    // Ask user to overwrite
-//                } else {
-//                    // Write state to db
-//                }
-//            }
+            List<PlayerModel> players = new ArrayList<>();
+            for (PlayerModel player: players) {
+                if (enteredName.equals(player.getPlayerName())) {
+                    boolean overwrite = createOverwriteAlert(enteredName);
+                    if (overwrite) {
+                        // TODO: Overwrite save in db
+                        modal.close();
+                    }
+                } else {
+                    // TODO: Create save in db
+                }
+            }
         });
     }
 
