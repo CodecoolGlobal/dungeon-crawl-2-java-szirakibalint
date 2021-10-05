@@ -5,6 +5,7 @@ import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.model.PlayerModel;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,6 +22,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Objects;
+
 import javafx.scene.control.Button;
 import javafx.stage.StageStyle;
 
@@ -104,14 +108,29 @@ public class Main extends Application {
         cancelButton.setOnAction(e -> modal.close());
     }
 
+    private void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
+        saveButton.setOnAction(e -> {
+            String enteredName = nameField.getText();
+            List<PlayerModel> players = dbManager.getAllPlayers();
+            boolean alreadyExists = false;
+            for (PlayerModel player: players) {
+                if (enteredName.equals(player.getPlayerName())) {
+                    // Ask user to overwrite
+                } else {
+                    // Write state to db
+                }
+            }
+        });
+    }
+
     private Stage createSaveModal() {
         Label label = new Label("Name:");
-        TextField textField = new TextField();
+        TextField nameField = new TextField();
         Button saveButton = new Button("Save");
         Button cancelButton = new Button("Cancel");
         GridPane layout = new GridPane();
 
-        textField.setMinWidth(200);
+        nameField.setMinWidth(200);
         layout.setPadding(new Insets(10, 10, 10, 10));
         layout.setHgap(10);
         layout.setVgap(5);
@@ -122,7 +141,7 @@ public class Main extends Application {
         buttonContainer.getChildren().addAll(saveButton, cancelButton);
 
         layout.add(label, 0, 0);
-        layout.add(textField,0, 1);
+        layout.add(nameField,0, 1);
         layout.add(buttonContainer, 0, 2);
 
         Stage modal = new Stage();
@@ -134,6 +153,7 @@ public class Main extends Application {
         modal.setResizable(false);
 
         initModalCancelButtonClickEvent(modal, cancelButton);
+        initModalSaveButtonClickEvent(modal, saveButton, nameField);
         return modal;
     }
 
