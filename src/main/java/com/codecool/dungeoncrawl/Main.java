@@ -33,13 +33,17 @@ public class Main extends Application {
     GameDatabaseManager dbManager;
     Label inventoryLabel = new Label("Inventory is empty");
     Button pickUpButton = new Button("Pick up");
+    Button importButton = new Button("Import");
+    Button exportButton = new Button("Export");
 
     public static void main(String[] args) {
         launch(args);
     }
 
     public static void loadLevel(String levelMap){
+        Player player = map.getPlayer();
         map = MapLoader.loadMap(levelMap);
+        map.setPlayer(player);
     }
 
     @Override
@@ -47,6 +51,8 @@ public class Main extends Application {
         setupDbManager();
         canvas.setFocusTraversable(false);
         pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
+        importButton.focusedProperty().addListener(e -> canvas.requestFocus());
+        exportButton.focusedProperty().addListener(e -> canvas.requestFocus());
         setPickUpButtonClickEvent();
 
         GridPane ui = new GridPane();
@@ -58,10 +64,16 @@ public class Main extends Application {
         ui.add(pickUpButton, 0, 1);
         ui.add(inventoryLabel, 0, 2);
 
+        GridPane ui2 = new GridPane();
+
+        ui2.add(importButton, 0, 0);
+        ui2.add(exportButton, 1, 0);
+
         BorderPane borderPane = new BorderPane();
 
         borderPane.setCenter(canvas);
         borderPane.setRight(ui);
+        borderPane.setTop(ui2);
 
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
