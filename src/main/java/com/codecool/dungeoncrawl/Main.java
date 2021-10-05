@@ -107,7 +107,7 @@ public class Main extends Application {
         cancelButton.setOnAction(e -> modal.close());
     }
 
-    private Alert createOverwriteAlert(String enteredName) {
+    private boolean createOverwriteAlert(String enteredName) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm overwrite");
         alert.setHeaderText(String.format("\"%s\" found in the database", enteredName));
@@ -116,21 +116,33 @@ public class Main extends Application {
         ButtonType yesButton = new ButtonType("Yes");
         ButtonType noButton = new ButtonType("No");
         alert.getButtonTypes().setAll(yesButton, noButton);
-        return alert;
+        boolean result;
+        Optional<ButtonType> chosenButton = alert.showAndWait();
+        ButtonType choice = chosenButton.orElse(noButton);
+        if (choice.equals(yesButton)) {
+            result = true;
+        } else if (choice.equals(noButton)) {
+            result = false;
+        } else {
+            result = false;
+        }
+        return result;
     }
 
     private void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
         saveButton.setOnAction(e -> {
             String enteredName = nameField.getText();
-            List<PlayerModel> players = dbManager.getAllPlayers();
-            boolean alreadyExists = false;
-            for (PlayerModel player: players) {
-                if (enteredName.equals(player.getPlayerName())) {
-                    // Ask user to overwrite
-                } else {
-                    // Write state to db
-                }
-            }
+            System.out.println(createOverwriteAlert(enteredName));
+//            List<PlayerModel> players = dbManager.getAllPlayers();
+//            createOverwriteAlert(enteredName);
+//            boolean alreadyExists = false;
+//            for (PlayerModel player: players) {
+//                if (enteredName.equals(player.getPlayerName())) {
+//                    // Ask user to overwrite
+//                } else {
+//                    // Write state to db
+//                }
+//            }
         });
     }
 
