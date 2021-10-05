@@ -17,10 +17,12 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 import javafx.scene.control.Button;
+import javafx.stage.StageStyle;
 
 
 public class Main extends Application {
@@ -92,9 +94,26 @@ public class Main extends Application {
                 || keyEvent.getCode() == KeyCode.ESCAPE) {
             exit();
         } else if (saveCombination.match(keyEvent)) {
-            // Open modal here
-            System.out.println("Ctrl + S combo triggered");
+            openSaveModal();
         }
+    }
+
+    private Stage createSaveModal() {
+        Label label = new Label("Save game here");
+        StackPane layout = new StackPane();
+        layout.getChildren().add(label);
+
+        Stage window = new Stage();
+        window.setTitle("Save game");
+        Scene content = new Scene(layout, 400, 400);
+        window.setScene(content);
+        window.setResizable(false);
+        return window;
+    }
+
+    private void openSaveModal() {
+        Stage modal = createSaveModal();
+        modal.show();
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
