@@ -13,10 +13,12 @@ public class Player extends Actor {
     private final Inventory inventory = new Inventory();
     private boolean hasSword = false;
     protected boolean isAlive;
+    private String name;
 
     public Player(Cell cell) {
         super(cell);
         isAlive = true;
+        name = "Player";
     }
 
     @Override
@@ -77,5 +79,13 @@ public class Player extends Actor {
 
     public boolean checkIsAlive() {
         return (this.getHealth() > 0);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
