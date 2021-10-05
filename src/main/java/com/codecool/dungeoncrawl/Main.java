@@ -100,6 +100,10 @@ public class Main extends Application {
         }
     }
 
+    private void initModalCancelButtonClickEvent(Stage modal, Button cancelButton) {
+        cancelButton.setOnAction(e -> modal.close());
+    }
+
     private Stage createSaveModal() {
         Label label = new Label("Name:");
         TextField textField = new TextField();
@@ -121,14 +125,16 @@ public class Main extends Application {
         layout.add(textField,0, 1);
         layout.add(buttonContainer, 0, 2);
 
-        Stage window = new Stage();
+        Stage modal = new Stage();
         Scene content = new Scene(layout, 250, 120);
 
-        window.setTitle("Save game");
-        // window.setAlwaysOnTop(true);
-        window.setScene(content);
-        window.setResizable(false);
-        return window;
+        modal.setTitle("Save game");
+        // modal.setAlwaysOnTop(true);
+        modal.setScene(content);
+        modal.setResizable(false);
+
+        initModalCancelButtonClickEvent(modal, cancelButton);
+        return modal;
     }
 
     private void openSaveModal() {
