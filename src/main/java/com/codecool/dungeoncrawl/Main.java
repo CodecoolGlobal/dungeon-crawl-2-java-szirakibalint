@@ -12,8 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -24,8 +23,8 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-import javafx.scene.control.Button;
 import javafx.stage.StageStyle;
 
 import javax.swing.text.Position;
@@ -106,6 +105,18 @@ public class Main extends Application {
 
     private void initModalCancelButtonClickEvent(Stage modal, Button cancelButton) {
         cancelButton.setOnAction(e -> modal.close());
+    }
+
+    private Alert createOverwriteAlert(String enteredName) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm overwrite");
+        alert.setHeaderText(String.format("\"%s\" found in the database", enteredName));
+        alert.setContentText("Would you like to overwrite the already existing state?");
+
+        ButtonType yesButton = new ButtonType("Yes");
+        ButtonType noButton = new ButtonType("No");
+        alert.getButtonTypes().setAll(yesButton, noButton);
+        return alert;
     }
 
     private void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
