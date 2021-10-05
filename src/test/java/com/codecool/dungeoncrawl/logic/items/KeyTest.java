@@ -22,4 +22,10 @@ public class KeyTest {
         String expectedOutcome = "key";
         assertEquals(expectedOutcome, key.getTileName());
     }
+
+    @Test
+    void toString_Key_ReturnKey() {
+        String expectedOutcome = "Key";
+        assertEquals(expectedOutcome, key.toString());
+    }
 }
