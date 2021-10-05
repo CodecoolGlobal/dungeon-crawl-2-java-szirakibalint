@@ -7,22 +7,24 @@ import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 import javafx.scene.control.Button;
 import javafx.stage.StageStyle;
+
+import javax.swing.text.Position;
 
 
 public class Main extends Application {
@@ -99,13 +101,31 @@ public class Main extends Application {
     }
 
     private Stage createSaveModal() {
-        Label label = new Label("Save game here");
-        StackPane layout = new StackPane();
-        layout.getChildren().add(label);
+        Label label = new Label("Name:");
+        TextField textField = new TextField();
+        Button saveButton = new Button("Save");
+        Button cancelButton = new Button("Cancel");
+        GridPane layout = new GridPane();
+
+        textField.setMinWidth(200);
+        layout.setPadding(new Insets(10, 10, 10, 10));
+        layout.setHgap(10);
+        layout.setVgap(5);
+        layout.setAlignment(Pos.CENTER);
+
+        HBox buttonContainer = new HBox();
+        buttonContainer.setSpacing(110);
+        buttonContainer.getChildren().addAll(saveButton, cancelButton);
+
+        layout.add(label, 0, 0);
+        layout.add(textField,0, 1);
+        layout.add(buttonContainer, 0, 2);
 
         Stage window = new Stage();
+        Scene content = new Scene(layout, 250, 120);
+
         window.setTitle("Save game");
-        Scene content = new Scene(layout, 400, 400);
+        // window.setAlwaysOnTop(true);
         window.setScene(content);
         window.setResizable(false);
         return window;
