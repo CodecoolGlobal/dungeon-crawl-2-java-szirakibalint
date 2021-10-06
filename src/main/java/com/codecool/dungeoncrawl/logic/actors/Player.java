@@ -15,10 +15,16 @@ public class Player extends Actor {
     protected boolean isAlive;
     private String name;
 
+    private int attack = 5;
+
     public Player(Cell cell) {
         super(cell);
         isAlive = true;
         name = "Player";
+    }
+
+    public int getAttack() {
+        return attack;
     }
 
     @Override
@@ -50,7 +56,6 @@ public class Player extends Actor {
     @Override
     protected int calculateAttack(){
         List<Item> items = inventory.getContent().stream().filter(x -> x instanceof Sword).toList();
-        int attack = 5;
         for (Item weapon: items){
             if (((Sword) weapon).getDamage() > attack){
                 attack  = ((Sword) weapon).getDamage();
