@@ -69,7 +69,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        setupDbManager();
+        //setupDbManager();
         canvas.setFocusTraversable(false);
         pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
         importButton.focusedProperty().addListener(e -> canvas.requestFocus());
@@ -130,7 +130,11 @@ public class Main extends Application {
                 try {
                     Gson gson = new Gson();
                     String jsonString = gson.toJson(map);
-                    gson.toJson(map, new FileWriter(selectedFile));
+                    System.out.println(jsonString);
+                    FileWriter writer = new FileWriter(selectedFile);
+                    gson.toJson(map, writer);
+                    writer.flush();
+                    writer.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
