@@ -26,7 +26,22 @@ public class PlayerDaoJdbc implements PlayerDao {
             statement.executeUpdate();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
-            player.setId(resultSet.getInt(1));
+            int playerId = resultSet.getInt(1);
+            player.setId(playerId);
+            List<Item> inventory = player.getInventory().getContent();
+            int swordId = 1;
+            int keyId = 2;
+            for (Item item : inventory) {
+                sql = "INSERT INTO player_item (player_id, item_id) VALUES (?, ?)";
+                PreparedStatement itemStatement = conn.prepareStatement(sql);
+                itemStatement.setInt(1, playerId);
+                if (item.getTileName().equals("sword")) {
+                    itemStatement.setInt(2, swordId);
+                } else {
+                    itemStatement.setInt(2, keyId);
+                }
+                itemStatement.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
