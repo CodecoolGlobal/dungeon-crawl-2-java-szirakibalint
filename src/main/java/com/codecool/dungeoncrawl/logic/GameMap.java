@@ -41,4 +41,8 @@ public class GameMap {
     public int getHeight() {
         return height;
     }
+
+    public Cell[][] getCells() {
+        return cells;
+    }
 }

@@ -7,6 +7,10 @@ public abstract class Item implements Drawable {
     transient protected Cell cell;
     private String name;
 
+    public Item(){
+
+    }
+
     public Item(Cell cell) {
         this.cell = cell;
         this.cell.setItem(this);
@@ -20,5 +24,10 @@ public abstract class Item implements Drawable {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    @Override
+    public String getTileName() {
+        return "item";
     }
 }
