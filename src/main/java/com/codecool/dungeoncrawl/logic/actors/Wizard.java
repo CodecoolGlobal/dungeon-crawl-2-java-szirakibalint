@@ -21,6 +21,10 @@ public class Wizard extends Enemy{
         return "wizard";
     }
 
+    public char getMovementDirection() {
+        return movementDirection;
+    }
+
     public int[] getNextMove(){
 
         int d = (int) Math.signum(0.5  - Math.random());
