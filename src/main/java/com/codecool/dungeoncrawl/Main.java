@@ -131,14 +131,8 @@ public class Main extends Application {
                 Gson gson = new GsonBuilder()
                         .registerTypeAdapter(Item.class,
                                 new ItemSerializer())
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer())
                         .registerTypeAdapter(Actor.class,
                                 new ItemSerializer()).create();
-                String jsonString = gson.toJson(map);
-                System.out.println(jsonString);
                 FileWriter writer = new FileWriter(selectedFile);
                 gson.toJson(map, writer);
                 writer.flush();
@@ -147,37 +141,6 @@ public class Main extends Application {
                 ex.printStackTrace();
             }
         }
-
-        else {
-            System.out.println("File selection cancelled.");
-        }
-        fileChooser = new FileChooser();
-        selectedFile = fileChooser.showSaveDialog(null);
-
-        if (selectedFile != null) {
-            System.out.println("success");
-            System.out.println("File selected: " + selectedFile.getName());
-            try {
-                Gson gson = new GsonBuilder()
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer()).create();
-                String jsonString = gson.toJson(map.getPlayer());
-                System.out.println(jsonString);
-                FileWriter writer = new FileWriter(selectedFile);
-                gson.toJson(map.getPlayer(), writer);
-                writer.flush();
-                writer.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
         else {
             System.out.println("File selection cancelled.");
         }
@@ -190,34 +153,33 @@ public class Main extends Application {
     }
 
     private void importGame() {
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile = fileChooser.showOpenDialog(null);
+        File selectedFile = new FileChooser().showOpenDialog(null);
 
         if (selectedFile != null) {
-            System.out.println("success");
             System.out.println("File selected: " + selectedFile.getName());
             try {
                 Gson gson = new GsonBuilder()
                         .registerTypeAdapter(Item.class,
                                 new ItemSerializer())
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer())
                         .registerTypeAdapter(Actor.class,
                                 new ItemSerializer()).create();
                 JsonReader reader = new JsonReader(new FileReader(selectedFile));
                 map = gson.fromJson(reader, GameMap.class);
-                System.out.println(map);
 
                 for (Cell[] row : map.getCells()){
-                    for (Cell cell: row){
+                    for (Cell cell: row) {
                         cell.setGameMap(map);
-                        if (cell.getActor() instanceof Player){
-                            System.out.println(cell.getActor());
+                        Actor actor = cell.getActor();
+                        if (actor != null) {
+                            actor.setCell(cell);
+                            if (actor instanceof Player){
+                                map.setPlayer((Player) actor);
+                            }
                         }
                     }
                 }
+                refresh();
+                inventoryLabel.setText(map.getPlayer().getInventory().toString());
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -226,7 +188,7 @@ public class Main extends Application {
         else {
             System.out.println("File selection cancelled.");
         }
-        fileChooser = new FileChooser();
+        /*fileChooser = new FileChooser();
         selectedFile = fileChooser.showOpenDialog(null);
 
         if (selectedFile != null) {
@@ -270,7 +232,7 @@ public class Main extends Application {
 
         else {
             System.out.println("File selection cancelled.");
-        }
+        }*/
     }
 
     private void onKeyReleased(KeyEvent keyEvent) {
