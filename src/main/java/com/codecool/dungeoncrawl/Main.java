@@ -5,6 +5,8 @@ import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -18,7 +20,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
 import javafx.scene.control.Button;
 
@@ -54,6 +62,8 @@ public class Main extends Application {
         importButton.focusedProperty().addListener(e -> canvas.requestFocus());
         exportButton.focusedProperty().addListener(e -> canvas.requestFocus());
         setPickUpButtonClickEvent();
+        setExportButtonClickEvent();
+        setImportButtonClickEvent();
 
         GridPane ui = new GridPane();
         ui.setPrefWidth(200);
@@ -92,6 +102,55 @@ public class Main extends Application {
             player.pickUpItem();
             inventoryLabel.setText(player.getInventory().toString());
             refresh();
+        });
+    }
+
+    private void setExportButtonClickEvent() {
+        exportButton.setOnAction(e -> {
+
+            FileChooser fileChooser = new FileChooser();
+            File selectedFile = fileChooser.showSaveDialog(null);
+
+            if (selectedFile != null) {
+                System.out.println("success");
+                System.out.println("File selected: " + selectedFile.getName());
+                try {
+                    Gson gson = new Gson();
+                    String jsonString = gson.toJson(map);
+                    gson.toJson(map, new FileWriter(selectedFile));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            else {
+                System.out.println("File selection cancelled.");
+            }
+
+        });
+    }
+    private void setImportButtonClickEvent() {
+        importButton.setOnAction(e -> {
+
+            FileChooser fileChooser = new FileChooser();
+            File selectedFile = fileChooser.showOpenDialog(null);
+
+            if (selectedFile != null) {
+                System.out.println("success");
+                System.out.println("File selected: " + selectedFile.getName());
+                try {
+                    Gson gson = new Gson();
+                    JsonReader reader = new JsonReader(new FileReader(selectedFile));
+                    map = gson.fromJson(reader, GameMap.class);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            else {
+                System.out.println("File selection cancelled.");
+            }
+
         });
     }
 
