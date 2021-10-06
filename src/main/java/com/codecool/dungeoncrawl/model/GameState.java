@@ -50,4 +50,8 @@ public class GameState extends BaseModel {
     public void setPlayer(PlayerModel player) {
         this.player = player;
     }
+
+    public Cell[][] getCells() {
+        return cells;
+    }
 }
