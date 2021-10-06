@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WizardTests {
+public class WizardTest {
     GameMap gameMap;
     Wizard wizard;
     Player player;
