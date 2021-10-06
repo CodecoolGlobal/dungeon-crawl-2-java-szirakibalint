@@ -27,7 +27,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -63,11 +62,10 @@ public class Main extends Application {
         playerCell.setActor(player);
         map.setPlayer(player);
         player.setCell(playerCell);
-
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         //setupDbManager();
         canvas.setFocusTraversable(false);
         pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
