@@ -112,7 +112,6 @@ public class Main extends Application {
         pickUpButton.setOnAction(e -> {
             Player player = map.getPlayer();
             player.pickUpItem();
-            inventoryLabel.setText(player.getInventory().toString());
             refresh();
         });
     }
@@ -122,17 +121,12 @@ public class Main extends Application {
     }
 
     private void exportGame() {
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile = fileChooser.showSaveDialog(null);
+        File selectedFile = new FileChooser().showSaveDialog(null);
 
         if (selectedFile != null) {
             System.out.println("File selected: " + selectedFile.getName());
             try {
-                Gson gson = new GsonBuilder()
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer()).create();
+                Gson gson = getGson();
                 FileWriter writer = new FileWriter(selectedFile);
                 gson.toJson(map, writer);
                 writer.flush();
@@ -144,6 +138,14 @@ public class Main extends Application {
         else {
             System.out.println("File selection cancelled.");
         }
+    }
+
+    private Gson getGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(Item.class,
+                        new ItemSerializer())
+                .registerTypeAdapter(Actor.class,
+                        new ItemSerializer()).create();
     }
 
     private void setImportButtonClickEvent() {
@@ -158,81 +160,35 @@ public class Main extends Application {
         if (selectedFile != null) {
             System.out.println("File selected: " + selectedFile.getName());
             try {
-                Gson gson = new GsonBuilder()
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer()).create();
+                Gson gson = getGson();
                 JsonReader reader = new JsonReader(new FileReader(selectedFile));
+
                 map = gson.fromJson(reader, GameMap.class);
+                setRemainingAttributes();
 
-                for (Cell[] row : map.getCells()){
-                    for (Cell cell: row) {
-                        cell.setGameMap(map);
-                        Actor actor = cell.getActor();
-                        if (actor != null) {
-                            actor.setCell(cell);
-                            if (actor instanceof Player){
-                                map.setPlayer((Player) actor);
-                            }
-                        }
-                    }
-                }
-                refresh();
-                inventoryLabel.setText(map.getPlayer().getInventory().toString());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        else {
-            System.out.println("File selection cancelled.");
-        }
-        /*fileChooser = new FileChooser();
-        selectedFile = fileChooser.showOpenDialog(null);
-
-        if (selectedFile != null) {
-            System.out.println("success");
-            System.out.println("File selected: " + selectedFile.getName());
-            try {
-                Gson gson = new GsonBuilder()
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Item.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer())
-                        .registerTypeAdapter(Actor.class,
-                                new ItemSerializer()).create();
-                JsonReader reader = new JsonReader(new FileReader(selectedFile));
-                map.setPlayer(gson.fromJson(reader, Player.class));
-                for (Cell[] row : map.getCells()){
-                    for (Cell cell : row){
-                        Actor actor = cell.getActor();
-                        if (actor != null){
-
-                            System.out.println(actor);
-                            System.out.println(actor.getCell());
-
-                            actor.setCell(cell);
-                            if (actor instanceof Player){
-                                map.setPlayer((Player) actor);
-                            }
-                            System.out.println(actor.getCell());
-
-                        }
-                    }
-                }
-                inventoryLabel.setText(map.getPlayer().getInventory().toString());
                 refresh();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-
         else {
             System.out.println("File selection cancelled.");
-        }*/
+        }
+    }
+
+    private void setRemainingAttributes() {
+        for (Cell[] row : map.getCells()){
+            for (Cell cell: row) {
+                cell.setGameMap(map);
+                Actor actor = cell.getActor();
+                if (actor != null) {
+                    actor.setCell(cell);
+                    if (actor instanceof Player){
+                        map.setPlayer((Player) actor);
+                    }
+                }
+            }
+        }
     }
 
     private void onKeyReleased(KeyEvent keyEvent) {
@@ -336,7 +292,6 @@ public class Main extends Application {
     private void onKeyPressed(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
             case UP:
-                System.out.println(map);
                 map.getPlayer().move(0, -1);
                 enemyTurn();
                 refresh();
@@ -390,6 +345,7 @@ public class Main extends Application {
             }
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
+        inventoryLabel.setText(map.getPlayer().getInventory().toString());
     }
 
     private void setupDbManager() {
