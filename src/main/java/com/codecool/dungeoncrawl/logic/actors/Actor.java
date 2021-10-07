@@ -18,12 +18,16 @@ public abstract class Actor implements Drawable {
     public void move(int dx, int dy) {
         Cell nextCell = this.cell.getNeighbor(dx, dy);
 
-        cell.setActor(null);
-        nextCell.setActor(this);
-        cell = nextCell;
-        if ((cell.getType() == CellType.HEARTONFLOOR) && (this instanceof Player)) {
-            health = health > 0 ? health + 10 : 10;
-            this.cell.setType(CellType.FLOOR);
+        if (nextCell != null){
+            cell.setActor(null);
+            nextCell.setActor(this);
+            cell = nextCell;
+            if ((cell.getType() == CellType.HEARTONFLOOR) && (this instanceof Player)) {
+                health = health > 0 ? health + 10 : 10;
+                this.cell.setType(CellType.FLOOR);
+            }
+        } else {
+            System.out.println("Target cell out of range");
         }
     }
 
