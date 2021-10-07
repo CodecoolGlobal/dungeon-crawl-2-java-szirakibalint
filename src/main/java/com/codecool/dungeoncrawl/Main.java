@@ -79,11 +79,10 @@ public class Main extends Application {
     }
 
     public void setImportButtonClickEvent() {
-        uiHandler.getImportButton().setOnAction(e ->
-                {
+        uiHandler.getImportButton().setOnAction(e -> {
                     GameMap importedGame = jsonHandler.importGame();
                     if (importedGame != null) {
-                        this.map = jsonHandler.importGame();
+                        this.map = importedGame;
                         uiHandler.refresh(map);
                     }
                 }
