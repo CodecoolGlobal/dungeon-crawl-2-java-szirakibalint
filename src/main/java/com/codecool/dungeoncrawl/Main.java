@@ -4,51 +4,30 @@ import com.codecool.dungeoncrawl.dao.GameDatabaseManager;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
-import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Player;
-import com.codecool.dungeoncrawl.logic.items.Item;
-import com.codecool.dungeoncrawl.logic.util.ItemSerializer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
+import com.codecool.dungeoncrawl.logic.util.JsonHandler;
+import com.codecool.dungeoncrawl.logic.util.UiHandler;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 public class Main extends Application {
     static GameMap map = MapLoader.loadMap("/map.txt");
-    Canvas canvas = new Canvas(
-            map.getWidth() * Tiles.TILE_WIDTH,
-            map.getHeight() * Tiles.TILE_WIDTH);
-    GraphicsContext context = canvas.getGraphicsContext2D();
-    Label healthLabel = new Label();
+    JsonHandler jsonHandler = new JsonHandler();
+    private UiHandler uiHandler = new UiHandler();
+
     GameDatabaseManager dbManager;
-    Label inventoryLabel = new Label("Inventory is empty");
-    Button pickUpButton = new Button("Pick up");
-    Button importButton = new Button("Import");
-    Button exportButton = new Button("Export");
 
     public static void main(String[] args) {
         launch(args);
@@ -67,126 +46,45 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         //setupDbManager();
-        canvas.setFocusTraversable(false);
-        pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
-        importButton.focusedProperty().addListener(e -> canvas.requestFocus());
-        exportButton.focusedProperty().addListener(e -> canvas.requestFocus());
-        setPickUpButtonClickEvent();
-        setExportButtonClickEvent();
-        setImportButtonClickEvent();
 
-        GridPane ui = new GridPane();
-        ui.setPrefWidth(200);
-        ui.setPadding(new Insets(10));
+        uiHandler.initCanvas(map.getWidth() * Tiles.TILE_WIDTH,
+                map.getHeight() * Tiles.TILE_WIDTH);
 
-        ui.add(new Label("Health: "), 0, 0);
-        ui.add(healthLabel, 1, 0);
-        ui.add(pickUpButton, 0, 1);
-        ui.add(inventoryLabel, 0, 2);
+        uiHandler.initButtons(this);
 
-        GridPane ui2 = new GridPane();
+        BorderPane window = uiHandler.setUpWindow();
 
-        ui2.add(importButton, 0, 0);
-        ui2.add(exportButton, 1, 0);
-
-        BorderPane borderPane = new BorderPane();
-
-        borderPane.setCenter(canvas);
-        borderPane.setRight(ui);
-        borderPane.setTop(ui2);
-
-        Scene scene = new Scene(borderPane);
+        Scene scene = new Scene(window);
         primaryStage.setScene(scene);
-        refresh();
+        uiHandler.refresh(map);
         scene.setOnKeyPressed(this::onKeyPressed);
         scene.setOnKeyReleased(this::onKeyReleased);
 
         primaryStage.setTitle("Private Static Final Fantasy");
         primaryStage.show();
-        canvas.requestFocus();
+        uiHandler.getCanvas().requestFocus();
     }
 
-    private void setPickUpButtonClickEvent() {
-        pickUpButton.setOnAction(e -> {
+
+    public void setPickUpButtonClickEvent() {
+        uiHandler.getPickUpButton().setOnAction(e -> {
             Player player = map.getPlayer();
             player.pickUpItem();
-            refresh();
+            uiHandler.refresh(map);
         });
     }
 
-    private void setExportButtonClickEvent() {
-        exportButton.setOnAction(e -> exportGame());
+    public void setExportButtonClickEvent() {
+        uiHandler.getExportButton().setOnAction(e -> jsonHandler.exportGame(map));
     }
 
-    private void exportGame() {
-        File selectedFile = new FileChooser().showSaveDialog(null);
-
-        if (selectedFile != null) {
-            System.out.println("File selected: " + selectedFile.getName());
-            try {
-                Gson gson = getGson();
-                FileWriter writer = new FileWriter(selectedFile);
-                gson.toJson(map, writer);
-                writer.flush();
-                writer.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        else {
-            System.out.println("File selection cancelled.");
-        }
-    }
-
-    private Gson getGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(Item.class,
-                        new ItemSerializer())
-                .registerTypeAdapter(Actor.class,
-                        new ItemSerializer()).create();
-    }
-
-    private void setImportButtonClickEvent() {
-        importButton.setOnAction(e ->
-            importGame()
-        );
-    }
-
-    private void importGame() {
-        File selectedFile = new FileChooser().showOpenDialog(null);
-
-        if (selectedFile != null) {
-            System.out.println("File selected: " + selectedFile.getName());
-            try {
-                Gson gson = getGson();
-                JsonReader reader = new JsonReader(new FileReader(selectedFile));
-
-                map = gson.fromJson(reader, GameMap.class);
-                setRemainingAttributes();
-
-                refresh();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        else {
-            System.out.println("File selection cancelled.");
-        }
-    }
-
-    private void setRemainingAttributes() {
-        for (Cell[] row : map.getCells()){
-            for (Cell cell: row) {
-                cell.setGameMap(map);
-                Actor actor = cell.getActor();
-                if (actor != null) {
-                    actor.setCell(cell);
-                    if (actor instanceof Player){
-                        map.setPlayer((Player) actor);
-                    }
+    public void setImportButtonClickEvent() {
+        uiHandler.getImportButton().setOnAction(e ->
+                {
+                    jsonHandler.importGame();
+                    uiHandler.refresh(map);
                 }
-            }
-        }
+        );
     }
 
     private void onKeyReleased(KeyEvent keyEvent) {
@@ -198,37 +96,11 @@ public class Main extends Application {
                 || keyEvent.getCode() == KeyCode.ESCAPE) {
             exit();
         } else if (saveCombination.match(keyEvent)) {
-            openSaveModal();
+            uiHandler.openSaveModal(this);
         }
     }
 
-    private void initModalCancelButtonClickEvent(Stage modal, Button cancelButton) {
-        cancelButton.setOnAction(e -> modal.close());
-    }
-
-    private boolean createOverwriteAlert(String enteredName) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm overwrite");
-        alert.setHeaderText(String.format("\"%s\" found in the database", enteredName));
-        alert.setContentText("Would you like to overwrite the already existing state?");
-
-        ButtonType yesButton = new ButtonType("Yes");
-        ButtonType noButton = new ButtonType("No");
-        alert.getButtonTypes().setAll(yesButton, noButton);
-        boolean result;
-        Optional<ButtonType> chosenButton = alert.showAndWait();
-        ButtonType choice = chosenButton.orElse(noButton);
-        if (choice.equals(yesButton)) {
-            result = true;
-        } else if (choice.equals(noButton)) {
-            result = false;
-        } else {
-            result = false;
-        }
-        return result;
-    }
-
-    private void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
+    public void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
         saveButton.setOnAction(e -> {
             String enteredName = nameField.getText();
 //            TODO: replace with dbManager usage
@@ -236,7 +108,7 @@ public class Main extends Application {
             List<PlayerModel> players = new ArrayList<>();
             for (PlayerModel player: players) {
                 if (enteredName.equals(player.getPlayerName())) {
-                    boolean overwrite = createOverwriteAlert(enteredName);
+                    boolean overwrite = uiHandler.createOverwriteAlert(enteredName);
                     if (overwrite) {
                         // TODO: Overwrite save in db
                         modal.close();
@@ -248,70 +120,31 @@ public class Main extends Application {
         });
     }
 
-    private Stage createSaveModal() {
-        Label label = new Label("Name:");
-        TextField nameField = new TextField();
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
-        GridPane layout = new GridPane();
-
-        nameField.setMinWidth(200);
-        layout.setPadding(new Insets(10, 10, 10, 10));
-        layout.setHgap(10);
-        layout.setVgap(5);
-        layout.setAlignment(Pos.CENTER);
-
-        HBox buttonContainer = new HBox();
-        buttonContainer.setSpacing(110);
-        buttonContainer.getChildren().addAll(saveButton, cancelButton);
-
-        layout.add(label, 0, 0);
-        layout.add(nameField,0, 1);
-        layout.add(buttonContainer, 0, 2);
-
-        Stage modal = new Stage();
-        Scene content = new Scene(layout, 250, 120);
-
-        modal.setTitle("Save game");
-        // modal.setAlwaysOnTop(true);
-        modal.setScene(content);
-        modal.setResizable(false);
-
-        initModalCancelButtonClickEvent(modal, cancelButton);
-        initModalSaveButtonClickEvent(modal, saveButton, nameField);
-        return modal;
-    }
-
-    private void openSaveModal() {
-        Stage modal = createSaveModal();
-        modal.show();
-    }
-
     private void onKeyPressed(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
             case UP:
                 map.getPlayer().move(0, -1);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case DOWN:
                 map.getPlayer().move(0, 1);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case LEFT:
                 map.getPlayer().move(-1, 0);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case RIGHT:
                 map.getPlayer().move(1,0);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case S:
                 Player player = map.getPlayer();
-                dbManager.savePlayer(player);
+                //dbManager.savePlayer(player);
                 break;
         }
     }
@@ -325,25 +158,6 @@ public class Main extends Application {
                 }
             }
         }
-    }
-
-    private void refresh() {
-        context.setFill(Color.BLACK);
-        context.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
-                Cell cell = map.getCell(x, y);
-                if (cell.getActor() != null) {
-                    Tiles.drawTile(context, cell.getActor(), x, y);
-                } else if (cell.getItem() != null) {
-                    Tiles.drawTile(context, cell.getItem(), x, y);
-                } else {
-                    Tiles.drawTile(context, cell, x, y);
-                }
-            }
-        }
-        healthLabel.setText("" + map.getPlayer().getHealth());
-        inventoryLabel.setText(map.getPlayer().getInventory().toString());
     }
 
     private void setupDbManager() {
@@ -362,5 +176,13 @@ public class Main extends Application {
             System.exit(1);
         }
         System.exit(0);
+    }
+
+    public static GameMap getMap() {
+        return map;
+    }
+
+    public static void setMap(GameMap newMap){
+        map = newMap;
     }
 }
