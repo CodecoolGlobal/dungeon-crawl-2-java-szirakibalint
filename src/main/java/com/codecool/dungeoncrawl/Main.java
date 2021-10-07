@@ -4,13 +4,8 @@ import com.codecool.dungeoncrawl.dao.GameDatabaseManager;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
-import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Player;
-import com.codecool.dungeoncrawl.logic.items.Item;
-import com.codecool.dungeoncrawl.logic.util.ItemSerializer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
+import com.codecool.dungeoncrawl.logic.util.JsonHandler;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -25,12 +20,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +29,7 @@ import java.util.Optional;
 
 public class Main extends Application {
     static GameMap map = MapLoader.loadMap("/map.txt");
+    static JsonHandler jsonHandler = new JsonHandler();
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -49,6 +40,10 @@ public class Main extends Application {
     Button pickUpButton = new Button("Pick up");
     Button importButton = new Button("Import");
     Button exportButton = new Button("Export");
+
+
+
+
 
     public static void main(String[] args) {
         launch(args);
@@ -115,78 +110,16 @@ public class Main extends Application {
     }
 
     private void setExportButtonClickEvent() {
-        exportButton.setOnAction(e -> exportGame());
-    }
-
-    private void exportGame() {
-        File selectedFile = new FileChooser().showSaveDialog(null);
-
-        if (selectedFile != null) {
-            System.out.println("File selected: " + selectedFile.getName());
-            try {
-                Gson gson = getGson();
-                FileWriter writer = new FileWriter(selectedFile);
-                gson.toJson(map, writer);
-                writer.flush();
-                writer.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        else {
-            System.out.println("File selection cancelled.");
-        }
-    }
-
-    private Gson getGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(Item.class,
-                        new ItemSerializer())
-                .registerTypeAdapter(Actor.class,
-                        new ItemSerializer()).create();
+        exportButton.setOnAction(e -> jsonHandler.exportGame(map));
     }
 
     private void setImportButtonClickEvent() {
         importButton.setOnAction(e ->
-            importGame()
-        );
-    }
-
-    private void importGame() {
-        File selectedFile = new FileChooser().showOpenDialog(null);
-
-        if (selectedFile != null) {
-            System.out.println("File selected: " + selectedFile.getName());
-            try {
-                Gson gson = getGson();
-                JsonReader reader = new JsonReader(new FileReader(selectedFile));
-
-                map = gson.fromJson(reader, GameMap.class);
-                setRemainingAttributes();
-
-                refresh();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        else {
-            System.out.println("File selection cancelled.");
-        }
-    }
-
-    private void setRemainingAttributes() {
-        for (Cell[] row : map.getCells()){
-            for (Cell cell: row) {
-                cell.setGameMap(map);
-                Actor actor = cell.getActor();
-                if (actor != null) {
-                    actor.setCell(cell);
-                    if (actor instanceof Player){
-                        map.setPlayer((Player) actor);
-                    }
+                {
+                    jsonHandler.importGame();
+                    refresh();
                 }
-            }
-        }
+        );
     }
 
     private void onKeyReleased(KeyEvent keyEvent) {
@@ -362,5 +295,13 @@ public class Main extends Application {
             System.exit(1);
         }
         System.exit(0);
+    }
+
+    public static GameMap getMap() {
+        return map;
+    }
+
+    public static void setMap(GameMap newMap){
+        map = newMap;
     }
 }
