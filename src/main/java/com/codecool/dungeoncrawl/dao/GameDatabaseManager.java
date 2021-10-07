@@ -33,6 +33,14 @@ public class GameDatabaseManager {
         playerDao.add(model, 0);
     }*/
 
+    public PlayerModel loadPlayer(String name) {
+        return playerDao.get(name);
+    }
+
+    public GameState loadGameState(int id, PlayerModel player) {
+        return gameStateDao.get(id, player);
+    }
+
     public void saveGameState(GameMap map, Player player) {
         GameState gameState = new GameState(map.getCells(), new PlayerModel(player));
         gameStateDao.add(gameState);
