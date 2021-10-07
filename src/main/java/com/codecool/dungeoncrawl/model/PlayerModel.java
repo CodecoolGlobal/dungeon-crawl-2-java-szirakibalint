@@ -9,6 +9,7 @@ public class PlayerModel extends BaseModel {
     private int x;
     private int y;
     private Inventory inventory;
+    private int stateId;
 
     public PlayerModel(String playerName, int x, int y) {
         this.playerName = playerName;
@@ -63,5 +64,13 @@ public class PlayerModel extends BaseModel {
 
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
+    }
+
+    public int getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(int stateId) {
+        this.stateId = stateId;
     }
 }
