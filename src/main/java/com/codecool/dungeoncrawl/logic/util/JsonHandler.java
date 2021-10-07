@@ -16,7 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class JsonHandler {
-    public void importGame() {
+    public GameMap importGame() {
         File selectedFile = new FileChooser().showOpenDialog(null);
 
         if (selectedFile != null) {
@@ -27,7 +27,7 @@ public class JsonHandler {
 
                 GameMap map = gson.fromJson(reader, GameMap.class);
                 setRemainingAttributes(map);
-                Main.setMap(map);
+                return map;
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -36,6 +36,7 @@ public class JsonHandler {
         else {
             System.out.println("File selection cancelled.");
         }
+        return null;
     }
 
     public void setRemainingAttributes(GameMap map) {

@@ -23,7 +23,7 @@ import java.util.List;
 
 
 public class Main extends Application {
-    static GameMap map = MapLoader.loadMap("/map.txt");
+    GameMap map = MapLoader.loadMap("/map.txt");
     JsonHandler jsonHandler = new JsonHandler();
     private UiHandler uiHandler = new UiHandler();
 
@@ -33,7 +33,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    public static void loadLevel(String levelMap){
+    public void loadLevel(String levelMap){
         Player player = map.getPlayer();
         map = MapLoader.loadMap(levelMap);
 
@@ -81,8 +81,11 @@ public class Main extends Application {
     public void setImportButtonClickEvent() {
         uiHandler.getImportButton().setOnAction(e ->
                 {
-                    jsonHandler.importGame();
-                    uiHandler.refresh(map);
+                    GameMap importedGame = jsonHandler.importGame();
+                    if (importedGame != null) {
+                        this.map = jsonHandler.importGame();
+                        uiHandler.refresh(map);
+                    }
                 }
         );
     }
@@ -121,31 +124,35 @@ public class Main extends Application {
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
+        Player player = map.getPlayer();
+        int dx = 0;
+        int dy = 0;
         switch (keyEvent.getCode()) {
             case UP:
-                map.getPlayer().move(0, -1);
-                enemyTurn();
-                uiHandler.refresh(map);
+                dy = -1;
                 break;
             case DOWN:
-                map.getPlayer().move(0, 1);
-                enemyTurn();
-                uiHandler.refresh(map);
+                dy = 1;
                 break;
             case LEFT:
-                map.getPlayer().move(-1, 0);
-                enemyTurn();
-                uiHandler.refresh(map);
+                dx = -1;
                 break;
             case RIGHT:
-                map.getPlayer().move(1,0);
-                enemyTurn();
-                uiHandler.refresh(map);
+                dx = 1;
                 break;
             case S:
-                Player player = map.getPlayer();
                 //dbManager.savePlayer(player);
                 break;
+        }
+        if (dx + dy != 0) {
+            player.move(dx, dy);
+            if (player.shouldLevelUp()) {
+                loadLevel("/map2.txt");
+                player.setLevelUp(false);
+            } else {
+                enemyTurn();
+            }
+            uiHandler.refresh(map);
         }
     }
 
@@ -178,11 +185,11 @@ public class Main extends Application {
         System.exit(0);
     }
 
-    public static GameMap getMap() {
+    public GameMap getMap() {
         return map;
     }
 
-    public static void setMap(GameMap newMap){
+    public void setMap(GameMap newMap){
         map = newMap;
     }
 }

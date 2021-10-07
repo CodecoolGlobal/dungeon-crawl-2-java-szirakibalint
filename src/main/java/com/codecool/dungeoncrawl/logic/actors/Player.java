@@ -14,6 +14,7 @@ public class Player extends Actor {
     private boolean hasSword = false;
     protected boolean isAlive;
     private String name;
+    private boolean levelUp;
 
     private int attack = 5;
 
@@ -46,7 +47,7 @@ public class Player extends Actor {
             }
             super.move(dx, dy);
         } else if (nextCell.getType() == CellType.STAIRSDOWN) {
-            Main.loadLevel("/map2.txt");
+            levelUp = true;
         } else if (nextCell.getActor() instanceof Enemy){
             attack(nextCell.getActor());
             if (nextCell.getActor() != null){
@@ -102,5 +103,13 @@ public class Player extends Actor {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean shouldLevelUp() {
+        return levelUp;
+    }
+
+    public void setLevelUp(boolean levelUp) {
+        this.levelUp = levelUp;
     }
 }
