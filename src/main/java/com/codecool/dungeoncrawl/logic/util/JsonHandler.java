@@ -1,6 +1,5 @@
 package com.codecool.dungeoncrawl.logic.util;
 
-import com.codecool.dungeoncrawl.Main;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.actors.Actor;
@@ -28,7 +27,6 @@ public class JsonHandler {
                 GameMap map = gson.fromJson(reader, GameMap.class);
                 setRemainingAttributes(map);
                 return map;
-
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
