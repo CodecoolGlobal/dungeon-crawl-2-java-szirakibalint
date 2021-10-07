@@ -1,10 +1,12 @@
 package com.codecool.dungeoncrawl.dao;
 
+import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.logic.items.Item;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerDaoJdbc implements PlayerDao {
@@ -71,6 +73,26 @@ public class PlayerDaoJdbc implements PlayerDao {
 
     @Override
     public List<PlayerModel> getAll() {
-        return null;
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "SELECT id, name, hp, x, y, state_id FROM player";
+            ResultSet resultSet = conn.createStatement().executeQuery(sql);
+            List<PlayerModel> players = new ArrayList<>();
+            while (resultSet.next()) {
+                int playerId = resultSet.getInt(1);
+                String name = resultSet.getString(2);
+                int hp = resultSet.getInt(3);
+                int x = resultSet.getInt(4);
+                int y = resultSet.getInt(5);
+                int stateId = resultSet.getInt(6);
+                PlayerModel player = new PlayerModel(name, x, y);
+                player.setHp(hp);
+                player.setStateId(stateId);
+                player.setId(playerId);
+                players.add(player);
+            }
+            return players;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
