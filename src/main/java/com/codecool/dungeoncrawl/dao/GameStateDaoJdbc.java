@@ -40,13 +40,10 @@ public class GameStateDaoJdbc implements GameStateDao {
             resultSet = mapStatement.getGeneratedKeys();
             resultSet.next();
             int mapId = resultSet.getInt(1);
-            int skeletonId = 1;
-            int wizardId = 2;
-            int golemId = 3;
             int swordId = 1;
             int keyId = 2;
-            for (int i = 0; i < cells[0].length; i++) {
-                for (int j = 0; j < cells.length; j++) {
+            for (int i = 0; i < cells.length; i++) {
+                for (int j = 0; j < cells[0].length; j++) {
                     Cell currentCell = cells[i][j];
                     String sqlCell = "INSERT INTO cell (type, x, y, map_id, enemy_id, item_id) VALUES (?, ?, ?, ?, ?, ?)";
                     PreparedStatement cellStatement = conn.prepareStatement(sqlCell);
@@ -56,11 +53,15 @@ public class GameStateDaoJdbc implements GameStateDao {
                     cellStatement.setInt(4, mapId);
                     if (currentCell.getActor() != null && !(currentCell.getActor() instanceof Player)) {
                         Actor enemy = currentCell.getActor();
-                        switch (enemy.getTileName()) {
-                            case "skeleton" -> cellStatement.setInt(5, skeletonId);
-                            case "wizard" -> cellStatement.setInt(5, wizardId);
-                            default -> cellStatement.setInt(5, golemId);
-                        }
+                        String sqlEnemy = "INSERT INTO enemy (hp, type) VALUES (?, ?)";
+                        PreparedStatement enemyStatement = conn.prepareStatement(sqlEnemy, Statement.RETURN_GENERATED_KEYS);
+                        enemyStatement.setInt(1, enemy.getHealth());
+                        enemyStatement.setString(2, enemy.getTileName());
+                        enemyStatement.executeUpdate();
+                        resultSet = enemyStatement.getGeneratedKeys();
+                        resultSet.next();
+                        int enemyId = resultSet.getInt(1);
+                        cellStatement.setInt(5, enemyId);
                     } else {
                         cellStatement.setNull(5, java.sql.Types.NULL);
                     }
@@ -77,7 +78,7 @@ public class GameStateDaoJdbc implements GameStateDao {
                 }
             }
             PlayerDao playerDao = new PlayerDaoJdbc(dataSource);
-            playerDao.add(state.getPlayer());
+            playerDao.add(state.getPlayer(), stateId);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

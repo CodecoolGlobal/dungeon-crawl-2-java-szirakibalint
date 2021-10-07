@@ -73,7 +73,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //setupDbManager();
+        setupDbManager();
         canvas.setFocusTraversable(false);
         pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
         importButton.focusedProperty().addListener(e -> canvas.requestFocus());
@@ -398,8 +398,7 @@ public class Main extends Application {
                 refresh();
                 break;
             case S:
-                Player player = map.getPlayer();
-                dbManager.savePlayer(player);
+                dbManager.saveGameState(map, map.getPlayer());
                 break;
         }
     }
