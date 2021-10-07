@@ -12,6 +12,10 @@ public class Inventory {
         inventory = new ArrayList<>();
     }
 
+    public void setInventory(List<Item> inventory) {
+        this.inventory = inventory;
+    }
+
     public void add(Item item) {
         inventory.add(item);
     }

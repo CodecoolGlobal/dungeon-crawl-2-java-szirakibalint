@@ -10,7 +10,7 @@ import com.codecool.dungeoncrawl.logic.util.Inventory;
 import java.util.List;
 
 public class Player extends Actor {
-    private final Inventory inventory = new Inventory();
+    private Inventory inventory = new Inventory();
     private boolean hasSword = false;
     protected boolean isAlive;
     private String name;
@@ -25,6 +25,10 @@ public class Player extends Actor {
 
     public int getAttack() {
         return attack;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     @Override
@@ -54,9 +58,10 @@ public class Player extends Actor {
     }
 
     @Override
-    protected int calculateAttack(){
+    public int calculateAttack(){
         List<Item> items = inventory.getContent().stream().filter(x -> x instanceof Sword).toList();
         for (Item weapon: items){
+            hasSword = true;
             if (((Sword) weapon).getDamage() > attack){
                 attack  = ((Sword) weapon).getDamage();
             }
