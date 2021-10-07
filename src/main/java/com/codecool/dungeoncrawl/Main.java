@@ -8,6 +8,7 @@ import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.logic.util.JsonHandler;
 import com.codecool.dungeoncrawl.logic.util.UiHandler;
 import com.codecool.dungeoncrawl.model.PlayerModel;
+import com.google.gson.JsonSyntaxException;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +18,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +35,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    public void loadLevel(String levelMap){
+    public void loadLevel(String levelMap) {
         Player player = map.getPlayer();
         map = MapLoader.loadMap(levelMap);
 
@@ -80,10 +82,19 @@ public class Main extends Application {
 
     public void setImportButtonClickEvent() {
         uiHandler.getImportButton().setOnAction(e -> {
-                    GameMap importedGame = jsonHandler.importGame();
-                    if (importedGame != null) {
-                        this.map = importedGame;
-                        uiHandler.refresh(map);
+                    GameMap importedGame;
+                    boolean tryAgain = true;
+                    while (tryAgain) {
+                        try {
+                            importedGame = jsonHandler.importGame();
+                            if (importedGame != null) {
+                                this.map = importedGame;
+                                uiHandler.refresh(map);
+                            }
+                            tryAgain = false;
+                        } catch (JsonSyntaxException ex) {
+                            tryAgain = uiHandler.showBadJsonDialog();
+                        }
                     }
                 }
         );
@@ -108,7 +119,7 @@ public class Main extends Application {
 //            TODO: replace with dbManager usage
 //            List<PlayerModel> players = dbManager.getAllPlayers();
             List<PlayerModel> players = new ArrayList<>();
-            for (PlayerModel player: players) {
+            for (PlayerModel player : players) {
                 if (enteredName.equals(player.getPlayerName())) {
                     boolean overwrite = uiHandler.createOverwriteAlert(enteredName);
                     if (overwrite) {
@@ -155,7 +166,7 @@ public class Main extends Application {
         }
     }
 
-    private void enemyTurn(){
+    private void enemyTurn() {
         for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 Cell cell = map.getCell(x, y);
@@ -182,13 +193,5 @@ public class Main extends Application {
             System.exit(1);
         }
         System.exit(0);
-    }
-
-    public GameMap getMap() {
-        return map;
-    }
-
-    public void setMap(GameMap newMap){
-        map = newMap;
     }
 }

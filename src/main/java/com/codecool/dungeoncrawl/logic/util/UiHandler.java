@@ -145,6 +145,25 @@ public class UiHandler {
         return modal;
     }
 
+    public Alert createBadJsonDialog(){
+        Alert alert = new Alert(Alert.AlertType.WARNING,
+                "Try again?",
+                ButtonType.OK,
+                ButtonType.CANCEL);
+        alert.setTitle("Import error!");
+        alert.setHeaderText("Unfortunately the given file is in wrong format. Please try another one!");
+
+        return alert;
+    }
+
+    public boolean showBadJsonDialog(){
+        Alert alert = createBadJsonDialog();
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isEmpty()) {
+            return false;
+        } else return result.get() == ButtonType.OK;
+    }
+
     public boolean createOverwriteAlert(String enteredName) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm overwrite");
