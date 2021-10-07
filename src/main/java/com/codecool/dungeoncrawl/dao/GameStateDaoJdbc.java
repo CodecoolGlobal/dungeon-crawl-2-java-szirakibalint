@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl.dao;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.logic.items.Item;
@@ -90,8 +91,37 @@ public class GameStateDaoJdbc implements GameStateDao {
     }
 
     @Override
-    public GameState get(int id) {
-        return null;
+    public GameState get(int stateId) {
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = """
+                SELECT
+                    cell.id,
+                    cell.type celltype,
+                    x,
+                    y,
+                    e.type enemytype,
+                    e.hp enemyhp,
+                    item_id,
+                    i.name itemname,
+                    saved_at
+                FROM cell
+                LEFT JOIN map m ON cell.map_id = m.id
+                LEFT JOIN game_state s ON m.state_id = s.id
+                LEFT JOIN item i ON i.id = cell.item_id
+                LEFT JOIN enemy e ON cell.enemy_id = e.id
+                WHERE state_id = ?
+                ORDER BY x, y;
+                """;
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setInt(1, stateId);
+            ResultSet resultSet = conn.createStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                // TODO
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
