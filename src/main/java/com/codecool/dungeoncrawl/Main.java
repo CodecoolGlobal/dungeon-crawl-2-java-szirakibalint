@@ -6,20 +6,18 @@ import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.logic.util.JsonHandler;
+import com.codecool.dungeoncrawl.logic.util.UiHandler;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,20 +28,9 @@ import java.util.Optional;
 public class Main extends Application {
     static GameMap map = MapLoader.loadMap("/map.txt");
     static JsonHandler jsonHandler = new JsonHandler();
-    Canvas canvas = new Canvas(
-            map.getWidth() * Tiles.TILE_WIDTH,
-            map.getHeight() * Tiles.TILE_WIDTH);
-    GraphicsContext context = canvas.getGraphicsContext2D();
-    Label healthLabel = new Label();
+    UiHandler uiHandler = new UiHandler();
+
     GameDatabaseManager dbManager;
-    Label inventoryLabel = new Label("Inventory is empty");
-    Button pickUpButton = new Button("Pick up");
-    Button importButton = new Button("Import");
-    Button exportButton = new Button("Export");
-
-
-
-
 
     public static void main(String[] args) {
         launch(args);
@@ -62,62 +49,44 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         //setupDbManager();
-        canvas.setFocusTraversable(false);
-        pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
-        importButton.focusedProperty().addListener(e -> canvas.requestFocus());
-        exportButton.focusedProperty().addListener(e -> canvas.requestFocus());
-        setPickUpButtonClickEvent();
-        setExportButtonClickEvent();
-        setImportButtonClickEvent();
 
-        GridPane ui = new GridPane();
-        ui.setPrefWidth(200);
-        ui.setPadding(new Insets(10));
+        uiHandler.initCanvas(map.getWidth() * Tiles.TILE_WIDTH,
+                map.getHeight() * Tiles.TILE_WIDTH);
 
-        ui.add(new Label("Health: "), 0, 0);
-        ui.add(healthLabel, 1, 0);
-        ui.add(pickUpButton, 0, 1);
-        ui.add(inventoryLabel, 0, 2);
+        uiHandler.initButtons(this);
 
-        GridPane ui2 = new GridPane();
 
-        ui2.add(importButton, 0, 0);
-        ui2.add(exportButton, 1, 0);
+        BorderPane window = uiHandler.setUpWindow();
 
-        BorderPane borderPane = new BorderPane();
-
-        borderPane.setCenter(canvas);
-        borderPane.setRight(ui);
-        borderPane.setTop(ui2);
-
-        Scene scene = new Scene(borderPane);
+        Scene scene = new Scene(window);
         primaryStage.setScene(scene);
-        refresh();
+        uiHandler.refresh(map);
         scene.setOnKeyPressed(this::onKeyPressed);
         scene.setOnKeyReleased(this::onKeyReleased);
 
         primaryStage.setTitle("Private Static Final Fantasy");
         primaryStage.show();
-        canvas.requestFocus();
+        uiHandler.getCanvas().requestFocus();
     }
 
-    private void setPickUpButtonClickEvent() {
-        pickUpButton.setOnAction(e -> {
+
+    public void setPickUpButtonClickEvent() {
+        uiHandler.getPickUpButton().setOnAction(e -> {
             Player player = map.getPlayer();
             player.pickUpItem();
-            refresh();
+            uiHandler.refresh(map);
         });
     }
 
-    private void setExportButtonClickEvent() {
-        exportButton.setOnAction(e -> jsonHandler.exportGame(map));
+    public void setExportButtonClickEvent() {
+        uiHandler.getExportButton().setOnAction(e -> jsonHandler.exportGame(map));
     }
 
-    private void setImportButtonClickEvent() {
-        importButton.setOnAction(e ->
+    public void setImportButtonClickEvent() {
+        uiHandler.getImportButton().setOnAction(e ->
                 {
                     jsonHandler.importGame();
-                    refresh();
+                    uiHandler.refresh(map);
                 }
         );
     }
@@ -225,22 +194,22 @@ public class Main extends Application {
             case UP:
                 map.getPlayer().move(0, -1);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case DOWN:
                 map.getPlayer().move(0, 1);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case LEFT:
                 map.getPlayer().move(-1, 0);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case RIGHT:
                 map.getPlayer().move(1,0);
                 enemyTurn();
-                refresh();
+                uiHandler.refresh(map);
                 break;
             case S:
                 Player player = map.getPlayer();
@@ -258,25 +227,6 @@ public class Main extends Application {
                 }
             }
         }
-    }
-
-    private void refresh() {
-        context.setFill(Color.BLACK);
-        context.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
-                Cell cell = map.getCell(x, y);
-                if (cell.getActor() != null) {
-                    Tiles.drawTile(context, cell.getActor(), x, y);
-                } else if (cell.getItem() != null) {
-                    Tiles.drawTile(context, cell.getItem(), x, y);
-                } else {
-                    Tiles.drawTile(context, cell, x, y);
-                }
-            }
-        }
-        healthLabel.setText("" + map.getPlayer().getHealth());
-        inventoryLabel.setText(map.getPlayer().getInventory().toString());
     }
 
     private void setupDbManager() {
