@@ -5,14 +5,18 @@ import com.codecool.dungeoncrawl.Tiles;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+import java.util.Optional;
 
 public class UiHandler {
 
@@ -105,5 +109,70 @@ public class UiHandler {
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
         inventoryLabel.setText(map.getPlayer().getInventory().toString());
+    }
+
+    public Stage createSaveModal(Main main) {
+        Label label = new Label("Name:");
+        TextField nameField = new TextField();
+        Button saveButton = new Button("Save");
+        Button cancelButton = new Button("Cancel");
+        GridPane layout = new GridPane();
+
+        nameField.setMinWidth(200);
+        layout.setPadding(new Insets(10, 10, 10, 10));
+        layout.setHgap(10);
+        layout.setVgap(5);
+        layout.setAlignment(Pos.CENTER);
+
+        HBox buttonContainer = new HBox();
+        buttonContainer.setSpacing(110);
+        buttonContainer.getChildren().addAll(saveButton, cancelButton);
+
+        layout.add(label, 0, 0);
+        layout.add(nameField,0, 1);
+        layout.add(buttonContainer, 0, 2);
+
+        Stage modal = new Stage();
+        Scene content = new Scene(layout, 250, 120);
+
+        modal.setTitle("Save game");
+        // modal.setAlwaysOnTop(true);
+        modal.setScene(content);
+        modal.setResizable(false);
+
+        initModalCancelButtonClickEvent(modal, cancelButton);
+        main.initModalSaveButtonClickEvent(modal, saveButton, nameField);
+        return modal;
+    }
+
+    public boolean createOverwriteAlert(String enteredName) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm overwrite");
+        alert.setHeaderText(String.format("\"%s\" found in the database", enteredName));
+        alert.setContentText("Would you like to overwrite the already existing state?");
+
+        ButtonType yesButton = new ButtonType("Yes");
+        ButtonType noButton = new ButtonType("No");
+        alert.getButtonTypes().setAll(yesButton, noButton);
+        boolean result;
+        Optional<ButtonType> chosenButton = alert.showAndWait();
+        ButtonType choice = chosenButton.orElse(noButton);
+        if (choice.equals(yesButton)) {
+            result = true;
+        } else if (choice.equals(noButton)) {
+            result = false;
+        } else {
+            result = false;
+        }
+        return result;
+    }
+
+    public void openSaveModal(Main main) {
+        Stage modal = createSaveModal(main);
+        modal.show();
+    }
+
+    public void initModalCancelButtonClickEvent(Stage modal, Button cancelButton) {
+        cancelButton.setOnAction(e -> modal.close());
     }
 }
