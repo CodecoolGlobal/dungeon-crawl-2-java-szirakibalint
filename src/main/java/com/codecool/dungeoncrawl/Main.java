@@ -123,20 +123,21 @@ public class Main extends Application {
     public void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
         saveButton.setOnAction(e -> {
             String enteredName = nameField.getText();
-//            TODO: replace with dbManager usage
-//            List<PlayerModel> players = dbManager.getAllPlayers();
-            List<PlayerModel> players = new ArrayList<>();
+            Player currentPlayer = map.getPlayer();
+            currentPlayer.setName(enteredName);
+            List<PlayerModel> players = dbManager.getAllPlayers();
             for (PlayerModel player : players) {
                 if (enteredName.equals(player.getPlayerName())) {
                     boolean overwrite = uiHandler.createOverwriteAlert(enteredName);
                     if (overwrite) {
                         // TODO: Overwrite save in db
-                        modal.close();
                     }
-                } else {
-                    // TODO: Create save in db
+                    modal.close();
+                    return;
                 }
             }
+            dbManager.saveGameState(map, currentPlayer);
+            modal.close();
         });
     }
 
@@ -157,9 +158,9 @@ public class Main extends Application {
             case RIGHT:
                 dx = 1;
                 break;
-            case S:
-                dbManager.saveGameState(map, map.getPlayer());
-                break;
+//            case S:
+//                dbManager.saveGameState(map, map.getPlayer());
+//                break;
             case R:
                 loadFromDB();
                 break;
@@ -197,7 +198,8 @@ public class Main extends Application {
     }
 
     private void loadFromDB() {
-        PlayerModel model = dbManager.loadPlayer("Player");
+        Player currentPlayer = map.getPlayer();
+        PlayerModel model = dbManager.loadPlayer(currentPlayer.getName());
         GameState state = dbManager.loadGameState(model.getStateId(), model);
         map = state.getCurrentMap();
         Player player = new Player(map.getCell(model.getX(), model.getY()));
