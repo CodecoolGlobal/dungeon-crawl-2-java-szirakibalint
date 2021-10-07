@@ -2,9 +2,11 @@ package com.codecool.dungeoncrawl.dao;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
-import com.codecool.dungeoncrawl.logic.actors.Actor;
-import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.logic.GameMap;
+import com.codecool.dungeoncrawl.logic.actors.*;
 import com.codecool.dungeoncrawl.logic.items.Item;
+import com.codecool.dungeoncrawl.logic.items.Key;
+import com.codecool.dungeoncrawl.logic.items.Sword;
 import com.codecool.dungeoncrawl.model.GameState;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 
@@ -12,6 +14,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class GameStateDaoJdbc implements GameStateDao {
     private DataSource dataSource;
@@ -34,8 +37,8 @@ public class GameStateDaoJdbc implements GameStateDao {
             Cell[][] cells = state.getCells();
             String sqlMap = "INSERT INTO map (width, height, state_id) VALUES (?, ?, ?)";
             PreparedStatement mapStatement = conn.prepareStatement(sqlMap, Statement.RETURN_GENERATED_KEYS);
-            mapStatement.setInt(1, cells[0].length);
-            mapStatement.setInt(2, cells.length);
+            mapStatement.setInt(1, cells.length);
+            mapStatement.setInt(2, cells[0].length);
             mapStatement.setInt(3, stateId);
             mapStatement.executeUpdate();
             resultSet = mapStatement.getGeneratedKeys();
@@ -91,7 +94,7 @@ public class GameStateDaoJdbc implements GameStateDao {
     }
 
     @Override
-    public GameState get(int stateId) {
+    public GameState get(int stateId, PlayerModel player) {
         try (Connection conn = dataSource.getConnection()) {
             String sql = """
                 SELECT
@@ -103,6 +106,8 @@ public class GameStateDaoJdbc implements GameStateDao {
                     e.hp enemyhp,
                     item_id,
                     i.name itemname,
+                    m.width,
+                    m.height,
                     saved_at
                 FROM cell
                 LEFT JOIN map m ON cell.map_id = m.id
@@ -114,11 +119,21 @@ public class GameStateDaoJdbc implements GameStateDao {
                 """;
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, stateId);
-            ResultSet resultSet = conn.createStatement().executeQuery(sql);
-            while (resultSet.next()) {
-                // TODO
+            ResultSet resultSet = statement.executeQuery();
+            int width;
+            int height;
+            if (!resultSet.next()) {
+                return null;
             }
-            return null;
+            width = resultSet.getInt("width");
+            height = resultSet.getInt("height");
+            GameMap map = new GameMap(width, height, CellType.FLOOR);
+            map = buildCell(resultSet, map);
+            while (resultSet.next()) {
+                map = buildCell(resultSet, map);
+            }
+            GameState gameState = new GameState(map, player);
+            return gameState;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -127,5 +142,37 @@ public class GameStateDaoJdbc implements GameStateDao {
     @Override
     public List<GameState> getAll() {
         return null;
+    }
+
+    private GameMap buildCell(ResultSet resultSet, GameMap gameMap) {
+        try {
+            Cell cell = gameMap.getCell(resultSet.getInt("x"), resultSet.getInt("y"));
+            cell.setType(CellType.valueOf(resultSet.getString("celltype").toUpperCase()));
+            if (resultSet.getString("enemytype") != null) {
+                Enemy enemy;
+                switch (resultSet.getString("enemytype")) {
+                    case "skeleton":
+                        enemy = new Skeleton(cell);
+                        break;
+                    case "wizard":
+                        enemy = new Wizard(cell);
+                        break;
+                    default:
+                        enemy = new Golem(cell);
+                }
+                enemy.setHealth(resultSet.getInt("enemyhp"));
+                cell.setActor(enemy);
+            }
+            if (resultSet.getString("itemname") != null) {
+                if (resultSet.getString("itemname").equals("sword")) {
+                    cell.setItem(new Sword());
+                } else {
+                    cell.setItem(new Key());
+                }
+            }
+            return gameMap;
+        } catch (SQLException sqle) {
+            throw new RuntimeException("Error during building a cell");
+        }
     }
 }
