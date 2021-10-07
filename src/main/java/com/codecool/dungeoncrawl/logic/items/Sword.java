@@ -11,6 +11,7 @@ public class Sword extends Item {
     }
 
     public Sword() {
+        super.setName("Sword");
     }
 
     @Override
