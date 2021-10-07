@@ -26,7 +26,6 @@ public class Tiles {
         tileMap.put("empty", new Tile(0, 0));
         tileMap.put("wall", new Tile(1, 1));
         tileMap.put("floor", new Tile(5, 0));
-        tileMap.put("item", new Tile(6, 1));
         tileMap.put("player", new Tile(25, 0));
         tileMap.put("playerwithsword", new Tile(25, 1));
         tileMap.put("ghost", new Tile(26, 6));

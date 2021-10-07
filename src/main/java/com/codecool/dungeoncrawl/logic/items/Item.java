@@ -7,9 +7,7 @@ public abstract class Item implements Drawable {
     transient protected Cell cell;
     private String name;
 
-    public Item(){
-
-    }
+    public Item(){} //needed for deserialization to work
 
     public Item(Cell cell) {
         this.cell = cell;

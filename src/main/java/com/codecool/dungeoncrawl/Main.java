@@ -27,7 +27,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -35,12 +34,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-
-import javafx.stage.StageStyle;
-
-import javax.swing.text.Position;
 
 
 public class Main extends Application {
@@ -68,11 +62,10 @@ public class Main extends Application {
         playerCell.setActor(player);
         map.setPlayer(player);
         player.setCell(playerCell);
-
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         //setupDbManager();
         canvas.setFocusTraversable(false);
         pickUpButton.focusedProperty().addListener(e -> canvas.requestFocus());
@@ -117,163 +110,83 @@ public class Main extends Application {
         pickUpButton.setOnAction(e -> {
             Player player = map.getPlayer();
             player.pickUpItem();
-            inventoryLabel.setText(player.getInventory().toString());
             refresh();
         });
     }
 
     private void setExportButtonClickEvent() {
-        exportButton.setOnAction(e -> {
-
-            FileChooser fileChooser = new FileChooser();
-            File selectedFile = fileChooser.showSaveDialog(null);
-
-            if (selectedFile != null) {
-                System.out.println("success");
-                System.out.println("File selected: " + selectedFile.getName());
-                try {
-                    Gson gson = new GsonBuilder()
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer()).create();
-                    String jsonString = gson.toJson(map);
-                    System.out.println(jsonString);
-                    FileWriter writer = new FileWriter(selectedFile);
-                    gson.toJson(map, writer);
-                    writer.flush();
-                    writer.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            else {
-                System.out.println("File selection cancelled.");
-            }
-            fileChooser = new FileChooser();
-            selectedFile = fileChooser.showSaveDialog(null);
-
-            if (selectedFile != null) {
-                System.out.println("success");
-                System.out.println("File selected: " + selectedFile.getName());
-                try {
-                    Gson gson = new GsonBuilder()
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer()).create();
-                    String jsonString = gson.toJson(map.getPlayer());
-                    System.out.println(jsonString);
-                    FileWriter writer = new FileWriter(selectedFile);
-                    gson.toJson(map.getPlayer(), writer);
-                    writer.flush();
-                    writer.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            else {
-                System.out.println("File selection cancelled.");
-            }
-
-        });
+        exportButton.setOnAction(e -> exportGame());
     }
+
+    private void exportGame() {
+        File selectedFile = new FileChooser().showSaveDialog(null);
+
+        if (selectedFile != null) {
+            System.out.println("File selected: " + selectedFile.getName());
+            try {
+                Gson gson = getGson();
+                FileWriter writer = new FileWriter(selectedFile);
+                gson.toJson(map, writer);
+                writer.flush();
+                writer.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("File selection cancelled.");
+        }
+    }
+
+    private Gson getGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(Item.class,
+                        new ItemSerializer())
+                .registerTypeAdapter(Actor.class,
+                        new ItemSerializer()).create();
+    }
+
     private void setImportButtonClickEvent() {
-        importButton.setOnAction(e -> {
+        importButton.setOnAction(e ->
+            importGame()
+        );
+    }
 
-            FileChooser fileChooser = new FileChooser();
-            File selectedFile = fileChooser.showOpenDialog(null);
+    private void importGame() {
+        File selectedFile = new FileChooser().showOpenDialog(null);
 
-            if (selectedFile != null) {
-                System.out.println("success");
-                System.out.println("File selected: " + selectedFile.getName());
-                try {
-                    Gson gson = new GsonBuilder()
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer()).create();
-                    JsonReader reader = new JsonReader(new FileReader(selectedFile));
-                    map = gson.fromJson(reader, GameMap.class);
-                    System.out.println(map);
+        if (selectedFile != null) {
+            System.out.println("File selected: " + selectedFile.getName());
+            try {
+                Gson gson = getGson();
+                JsonReader reader = new JsonReader(new FileReader(selectedFile));
 
-                    for (Cell[] row : map.getCells()){
-                        for (Cell cell: row){
-                            cell.setGameMap(map);
-                            if (cell.getActor() instanceof Player){
-                                System.out.println(cell.getActor());
-                            }
-                        }
+                map = gson.fromJson(reader, GameMap.class);
+                setRemainingAttributes();
+
+                refresh();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("File selection cancelled.");
+        }
+    }
+
+    private void setRemainingAttributes() {
+        for (Cell[] row : map.getCells()){
+            for (Cell cell: row) {
+                cell.setGameMap(map);
+                Actor actor = cell.getActor();
+                if (actor != null) {
+                    actor.setCell(cell);
+                    if (actor instanceof Player){
+                        map.setPlayer((Player) actor);
                     }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
                 }
             }
-
-            else {
-                System.out.println("File selection cancelled.");
-            }
-            fileChooser = new FileChooser();
-            selectedFile = fileChooser.showOpenDialog(null);
-
-            if (selectedFile != null) {
-                System.out.println("success");
-                System.out.println("File selected: " + selectedFile.getName());
-                try {
-                    Gson gson = new GsonBuilder()
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Item.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer())
-                            .registerTypeAdapter(Actor.class,
-                                    new ItemSerializer()).create();
-                    JsonReader reader = new JsonReader(new FileReader(selectedFile));
-                    map.setPlayer(gson.fromJson(reader, Player.class));
-                    for (Cell[] row : map.getCells()){
-                        for (Cell cell : row){
-                            Actor actor = cell.getActor();
-                            if (actor != null){
-
-                                System.out.println(actor);
-                                System.out.println(actor.getCell());
-
-                                actor.setCell(cell);
-                                if (actor instanceof Player){
-                                    map.setPlayer((Player) actor);
-                                }
-                                System.out.println(actor.getCell());
-
-                            }
-                        }
-                    }
-                    inventoryLabel.setText(map.getPlayer().getInventory().toString());
-                    refresh();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            else {
-                System.out.println("File selection cancelled.");
-            }
-
-        });
+        }
     }
 
     private void onKeyReleased(KeyEvent keyEvent) {
@@ -377,7 +290,6 @@ public class Main extends Application {
     private void onKeyPressed(KeyEvent keyEvent) {
         switch (keyEvent.getCode()) {
             case UP:
-                System.out.println(map);
                 map.getPlayer().move(0, -1);
                 enemyTurn();
                 refresh();
@@ -431,6 +343,7 @@ public class Main extends Application {
             }
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
+        inventoryLabel.setText(map.getPlayer().getInventory().toString());
     }
 
     private void setupDbManager() {

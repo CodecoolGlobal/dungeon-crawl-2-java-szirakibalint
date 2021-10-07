@@ -60,6 +60,5 @@ public class Cell implements Drawable {
 
     public void setGameMap(GameMap map) {
         this.gameMap = map;
-       // System.out.println(map);
     }
 }

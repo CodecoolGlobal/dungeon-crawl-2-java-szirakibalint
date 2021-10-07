@@ -8,9 +8,7 @@ public abstract class Actor implements Drawable {
     transient protected Cell cell;
     protected int health = 10;
 
-    public Actor(){
-
-    }
+    public Actor(){} //needed for deserialization to work
 
     public Actor(Cell cell) {
         this.cell = cell;
@@ -68,11 +66,9 @@ public abstract class Actor implements Drawable {
         actor.loseHealth(damage);
     }
 
-    public void act(){
-
-    }
+    public void act(){}
 
     public void setCell(Cell cell){
         this.cell = cell;
-    };
+    }
 }
