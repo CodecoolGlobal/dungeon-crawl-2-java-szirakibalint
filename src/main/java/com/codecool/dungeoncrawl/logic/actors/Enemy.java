@@ -13,4 +13,11 @@ public abstract class Enemy extends Actor{
         return "enemy";
     }
 
+    @Override
+    public void loseHealth(int healthChange){
+        super.loseHealth(healthChange);
+        if (health<=0){
+                this.cell.setActor(null);
+        }
+    }
 }

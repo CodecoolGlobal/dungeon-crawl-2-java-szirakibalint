@@ -45,11 +45,7 @@ public abstract class Actor implements Drawable {
 
     public void loseHealth(int healthChange){
         this.health -= healthChange;
-        if (health<=0){
-            if (this instanceof Enemy){
-                this.cell.setActor(null);
-            }
-        }
+
     }
 
     public int calculateDamage(int attack){
