@@ -2,10 +2,11 @@ package com.codecool.dungeoncrawl.logic.util;
 
 import com.codecool.dungeoncrawl.logic.items.Item;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
 
 public class Inventory {
-    private ArrayList<Item> inventory;
+    private List<Item> inventory;
 
     public Inventory() {
         inventory = new ArrayList<>();
@@ -34,7 +35,7 @@ public class Inventory {
         return false;
     }
 
-    public ArrayList<Item> getContent(){
+    public List<Item> getContent(){
         return inventory;
     }
 
