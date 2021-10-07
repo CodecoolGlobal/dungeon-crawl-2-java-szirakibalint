@@ -14,6 +14,7 @@ public class Player extends Actor {
     private boolean hasSword = false;
     protected boolean isAlive;
     private String name;
+    private boolean levelUp;
 
     private int attack = 5;
 
@@ -39,15 +40,18 @@ public class Player extends Actor {
     @Override
     public void move(int dx, int dy){
         Cell nextCell = this.cell.getNeighbor(dx, dy);
-        if (nextCell.getActor() == null && nextCell.getType() != CellType.WALL && (nextCell.getType() != CellType.CLOSEDDOOR || inventory.hasKey())) {
+        if (nextCell == null){
+            System.out.println("Target cell out of range");
+        }
+        else if (canMove(nextCell)) {
             if (nextCell.getType() == CellType.CLOSEDDOOR) {
                 if (inventory.useKey()) {
                     nextCell.setType(CellType.OPENDOOR);
                 }
             }
             super.move(dx, dy);
-        } if (nextCell.getType() == CellType.STAIRSDOWN) {
-            Main.loadLevel("/map2.txt");
+        } else if (nextCell.getType() == CellType.STAIRSDOWN) {
+            levelUp = true;
         } else if (nextCell.getActor() instanceof Enemy){
             attack(nextCell.getActor());
             if (nextCell.getActor() != null){
@@ -55,6 +59,13 @@ public class Player extends Actor {
             }
         }
         isAlive = checkIsAlive();
+    }
+
+    private boolean canMove(Cell nextCell) {
+        return nextCell.getType() != CellType.STAIRSDOWN
+                && nextCell.getActor() == null
+                && nextCell.getType() != CellType.WALL
+                && (nextCell.getType() != CellType.CLOSEDDOOR || inventory.hasKey());
     }
 
     @Override
@@ -97,5 +108,13 @@ public class Player extends Actor {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean shouldLevelUp() {
+        return levelUp;
+    }
+
+    public void setLevelUp(boolean levelUp) {
+        this.levelUp = levelUp;
     }
 }

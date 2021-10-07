@@ -21,4 +21,11 @@ public class EnemyTest {
     void getTileName_returnInstanceOfEnemy_notEnemy() {
         assertFalse(enemy.getTileName().equals("enemy"));
     }
+
+    @Test
+    void loseHealth_enemyHealthBelowZero_resultEnemyGoneFromTheMap() {
+        int health = enemy.health;
+        enemy.loseHealth(health + 1);
+        assertNull(gameMap.getCell(1,1).getActor());
+    }
 }

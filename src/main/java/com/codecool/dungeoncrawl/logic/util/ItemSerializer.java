@@ -1,6 +1,5 @@
 package com.codecool.dungeoncrawl.logic.util;
 
-import com.codecool.dungeoncrawl.logic.items.Item;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;

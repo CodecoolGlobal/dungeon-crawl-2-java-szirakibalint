@@ -8,9 +8,7 @@ public abstract class Actor implements Drawable {
     transient protected Cell cell;
     protected int health = 10;
 
-    public Actor(){
-
-    }
+    public Actor(){} //needed for deserialization to work
 
     public Actor(Cell cell) {
         this.cell = cell;
@@ -20,12 +18,16 @@ public abstract class Actor implements Drawable {
     public void move(int dx, int dy) {
         Cell nextCell = this.cell.getNeighbor(dx, dy);
 
-        cell.setActor(null);
-        nextCell.setActor(this);
-        cell = nextCell;
-        if ((cell.getType() == CellType.HEARTONFLOOR) && (this instanceof Player)) {
-            health = health > 0 ? health + 10 : 10;
-            this.cell.setType(CellType.FLOOR);
+        if (nextCell != null){
+            cell.setActor(null);
+            nextCell.setActor(this);
+            cell = nextCell;
+            if ((cell.getType() == CellType.HEARTONFLOOR) && (this instanceof Player)) {
+                health = health > 0 ? health + 10 : 10;
+                this.cell.setType(CellType.FLOOR);
+            }
+        } else {
+            System.out.println("Target cell out of range");
         }
     }
 
@@ -51,11 +53,7 @@ public abstract class Actor implements Drawable {
 
     public void loseHealth(int healthChange){
         this.health -= healthChange;
-        if (health<=0){
-            if (this instanceof Enemy){
-                this.cell.setActor(null);
-            }
-        }
+
     }
 
     public int calculateDamage(int attack){
@@ -72,11 +70,9 @@ public abstract class Actor implements Drawable {
         actor.loseHealth(damage);
     }
 
-    public void act(){
-
-    }
+    public void act(){}
 
     public void setCell(Cell cell){
         this.cell = cell;
-    };
+    }
 }

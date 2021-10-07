@@ -7,7 +7,7 @@ public class GameMap {
     private int height;
     private Cell[][] cells;
 
-    transient private Player player;
+    private Player player;
 
     public GameMap(int width, int height, CellType defaultCellType) {
         this.width = width;

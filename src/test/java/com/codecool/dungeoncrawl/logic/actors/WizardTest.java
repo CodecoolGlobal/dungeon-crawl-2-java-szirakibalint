@@ -15,13 +15,13 @@ public class WizardTest {
     Player player;
 
     @BeforeEach
-    void setWizzard() {
+    void setWizard() {
         gameMap = new GameMap(5, 5, CellType.FLOOR);
         wizard = new Wizard(gameMap.getCell(1, 1));
     }
 
     @Test
-    void getTileName_resultWizardTilename() {
+    void getTileName_resultWizardTileName() {
         String exceptedTileName = "wizard";
         assertEquals(exceptedTileName, wizard.getTileName());
     }

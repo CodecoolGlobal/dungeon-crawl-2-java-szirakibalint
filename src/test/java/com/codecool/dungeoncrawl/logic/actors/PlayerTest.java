@@ -22,6 +22,30 @@ public class PlayerTest {
     }
 
     @Test
+    void getTileName_TileNameWithIsAliveTrueWithNoSword_resultPlayer() {
+        String expectedOutput = "player";
+        assertEquals(expectedOutput, player.getTileName());
+    }
+
+    @Test
+    void getTileName_TileNameWithIsAliveFalseWithNoSword_resultGhost() {
+        player.loseHealth(player.health + 1);
+        player.move(1,0);
+        String expectedOutput = "ghost";
+        assertEquals(expectedOutput, player.getTileName());
+    }
+
+    @Test
+    void getTileName_TileNameWithIsAliveTrueWithSword_resultPlayerWithSword() {
+        item = new Sword(gameMap.getCell(2,1));
+        gameMap.getCell(2,1).setItem(item);
+        player.move(1,0);
+        player.pickUpItem();
+        String expectedOutput = "playerwithsword";
+        assertEquals(expectedOutput, player.getTileName());
+    }
+
+    @Test
     void pickUpItem_notSword_resultItemAddedToInventory() {
         item = new Key(gameMap.getCell(2,1));
         player.move(1,0);
@@ -74,6 +98,34 @@ public class PlayerTest {
         if (skeleton.health < 0) {
             assertTrue(player.health == regularhealthPlayer - skeleton.calculateAttack());
         }
+    }
+
+    @Test
+    void move_heartOnFloorWithPositiveHealth_resultHealthPlusTen() {
+        gameMap.getCell(2,1).setType(CellType.HEARTONFLOOR);
+        player.loseHealth(player.health - (player.health - 1));
+        int healthBefore = player.health;
+        player.move(1,0);
+        assertEquals(healthBefore + 10, player.health);
+    }
+
+    @Test
+    void move_heartOnFloorWithNegativeHealth_resultTenHealth() {
+        gameMap.getCell(2,1).setType(CellType.HEARTONFLOOR);
+        player.loseHealth(player.health + 1);
+        player.move(1,0);
+        assertEquals(10, player.health);
+
+    }
+
+    @Test
+    void pickupItem_pickingUpItem_resultItemIsNotOnMap() {
+        item = new Sword(gameMap.getCell(2,1));
+        gameMap.getCell(2,1).setItem(item);
+        player.move(1, 0);
+        player.pickUpItem();
+        player.move(-1, 0);
+        assertNull(gameMap.getCell(2,1).getItem());
     }
 
 
