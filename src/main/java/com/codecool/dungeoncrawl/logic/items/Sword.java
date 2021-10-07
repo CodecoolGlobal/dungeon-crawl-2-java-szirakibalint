@@ -10,6 +10,9 @@ public class Sword extends Item {
         super.setName("Sword");
     }
 
+    public Sword() {
+    }
+
     @Override
     public String getTileName() {
         return "sword";

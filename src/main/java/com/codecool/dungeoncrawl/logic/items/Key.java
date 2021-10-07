@@ -9,6 +9,9 @@ public class Key extends Item {
         super.setName("Key");
     }
 
+    public Key() {
+    }
+
     @Override
     public String getTileName() {
         return "key";
