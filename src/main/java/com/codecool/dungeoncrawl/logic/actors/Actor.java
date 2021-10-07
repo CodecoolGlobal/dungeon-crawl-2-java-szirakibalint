@@ -5,8 +5,12 @@ import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.Drawable;
 
 public abstract class Actor implements Drawable {
-    protected Cell cell;
+    transient protected Cell cell;
     protected int health = 10;
+
+    public Actor(){
+
+    }
 
     public Actor(Cell cell) {
         this.cell = cell;
@@ -15,6 +19,7 @@ public abstract class Actor implements Drawable {
 
     public void move(int dx, int dy) {
         Cell nextCell = this.cell.getNeighbor(dx, dy);
+
         cell.setActor(null);
         nextCell.setActor(this);
         cell = nextCell;

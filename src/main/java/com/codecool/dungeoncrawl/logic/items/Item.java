@@ -4,8 +4,12 @@ import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.Drawable;
 
 public abstract class Item implements Drawable {
-    protected Cell cell;
+    transient protected Cell cell;
     private String name;
+
+    public Item(){
+
+    }
 
     public Item(Cell cell) {
         this.cell = cell;
@@ -20,5 +24,10 @@ public abstract class Item implements Drawable {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    @Override
+    public String getTileName() {
+        return "item";
     }
 }
