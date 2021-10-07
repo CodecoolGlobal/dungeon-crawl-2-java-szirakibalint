@@ -2,12 +2,14 @@ package com.codecool.dungeoncrawl;
 
 import com.codecool.dungeoncrawl.dao.GameDatabaseManager;
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.logic.items.Item;
 import com.codecool.dungeoncrawl.logic.util.ItemSerializer;
+import com.codecool.dungeoncrawl.model.GameState;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -400,6 +402,9 @@ public class Main extends Application {
             case S:
                 dbManager.saveGameState(map, map.getPlayer());
                 break;
+            case R:
+                loadFromDB();
+                break;
         }
     }
 
@@ -439,6 +444,24 @@ public class Main extends Application {
         } catch (SQLException ex) {
             System.out.println("Cannot connect to database.");
         }
+    }
+
+    private void loadFromDB() {
+        PlayerModel model = dbManager.loadPlayer("Player");
+        GameState state = dbManager.loadGameState(model.getStateId(), model);
+        map = state.getCurrentMap();
+        Player player = new Player(map.getCell(model.getX(), model.getY()));
+        player.setHealth(model.getHp());
+        player.setName(model.getPlayerName());
+        List<Item> items = model.getInventory().getContent();
+        for (Item item : items) {
+            player.getInventory().add(item);
+        }
+        player.calculateAttack();
+        map.getCell(model.getX(), model.getY()).setActor(player);
+        map.setPlayer(player);
+        inventoryLabel.setText(player.getInventory().toString());
+        refresh();
     }
 
     private void exit() {
