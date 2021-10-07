@@ -5,8 +5,8 @@ import com.codecool.dungeoncrawl.model.PlayerModel;
 import java.util.List;
 
 public interface PlayerDao {
-    void add(PlayerModel player);
+    void add(PlayerModel player, int gameStateId);
     void update(PlayerModel player);
-    PlayerModel get(int id);
+    PlayerModel get(String name);
     List<PlayerModel> getAll();
 }
