@@ -2,6 +2,7 @@ package com.codecool.dungeoncrawl.dao;
 
 import com.codecool.dungeoncrawl.logic.actors.Player;
 import com.codecool.dungeoncrawl.logic.items.Item;
+import com.codecool.dungeoncrawl.logic.util.Inventory;
 import com.codecool.dungeoncrawl.model.PlayerModel;
 
 import javax.sql.DataSource;
@@ -67,8 +68,34 @@ public class PlayerDaoJdbc implements PlayerDao {
     }
 
     @Override
-    public PlayerModel get(int id) {
-        return null;
+    public PlayerModel get(String playerName) {
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "SELECT id, name, hp, x, y, state_id FROM player WHERE name = ?";
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setString(1, playerName);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int playerId = resultSet.getInt(1);
+                String name = resultSet.getString(2);
+                int hp = resultSet.getInt(3);
+                int x = resultSet.getInt(4);
+                int y = resultSet.getInt(5);
+                int stateId = resultSet.getInt(6);
+                PlayerModel player = new PlayerModel(name, x, y);
+                player.setHp(hp);
+                player.setStateId(stateId);
+                player.setId(playerId);
+                PlayerItemsDao playerItemsDao = new PlayerItemsDaoJdbc(dataSource);
+                List<Item> items = playerItemsDao.get(playerId);
+                Inventory inventory = new Inventory();
+                inventory.setInventory(items);
+                player.setInventory(inventory);
+                return player;
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -41,7 +41,7 @@ public class PlayerItemsDaoJdbc implements PlayerItemsDao {
                     """;
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setInt(1, player_id);
-            ResultSet resultSet = conn.createStatement().executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery();
             List<Item> items = new ArrayList<>();
             while (resultSet.next()) {
                 String itemName = resultSet.getString(2);
