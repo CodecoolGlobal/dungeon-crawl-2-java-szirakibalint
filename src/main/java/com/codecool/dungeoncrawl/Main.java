@@ -130,9 +130,10 @@ public class Main extends Application {
                 if (enteredName.equals(player.getPlayerName())) {
                     boolean overwrite = uiHandler.createOverwriteAlert(enteredName);
                     if (overwrite) {
-                        // TODO: Overwrite save in db
+                        dbManager.deletePlayer(currentPlayer);
+                        dbManager.saveGameState(map, currentPlayer);
+                        modal.close();
                     }
-                    modal.close();
                     return;
                 }
             }
