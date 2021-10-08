@@ -75,6 +75,34 @@ public class Main extends Application {
     }
 
 
+    public Stage createListView() {
+        Button loadButton = new Button("Load");
+        ListView<String> listView = new ListView<>();
+        List<PlayerModel> players = dbManager.getAllPlayers();
+        for (PlayerModel player: players) {
+            listView.getItems().add(player.getPlayerName());
+        }
+        listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        VBox layout = new VBox(5);
+        layout.getChildren().addAll(listView, loadButton);
+        Stage modal = new Stage();
+        modal.setTitle("Saves in the database");
+        Scene content = new Scene(layout, 400, 500);
+        modal.setScene(content);
+        loadButton.setOnAction(e -> {
+            String selectedName = listView.getSelectionModel().getSelectedItem();
+            Player currentPlayer = map.getPlayer();
+            currentPlayer.setName(selectedName);
+            loadFromDB();
+            modal.close();
+        });
+        return modal;
+    }
+
+    public void showListView() {
+        createListView().show();
+    }
+
     public void setPickUpButtonClickEvent() {
         uiHandler.getPickUpButton().setOnAction(e -> {
             Player player = map.getPlayer();
@@ -162,6 +190,9 @@ public class Main extends Application {
 //            case S:
 //                dbManager.saveGameState(map, map.getPlayer());
 //                break;
+            case L:
+                showListView();
+                break;
             case R:
                 loadFromDB();
                 break;
