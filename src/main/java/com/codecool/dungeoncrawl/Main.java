@@ -75,6 +75,34 @@ public class Main extends Application {
     }
 
 
+    public Stage createListView() {
+        Button loadButton = new Button("Load");
+        ListView<String> listView = new ListView<>();
+        List<PlayerModel> players = dbManager.getAllPlayers();
+        for (PlayerModel player: players) {
+            listView.getItems().add(player.getPlayerName());
+        }
+        listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        VBox layout = new VBox(5);
+        layout.getChildren().addAll(listView, loadButton);
+        Stage modal = new Stage();
+        modal.setTitle("Saves in the database");
+        Scene content = new Scene(layout, 400, 500);
+        modal.setScene(content);
+        loadButton.setOnAction(e -> {
+            String selectedName = listView.getSelectionModel().getSelectedItem();
+            Player currentPlayer = map.getPlayer();
+            currentPlayer.setName(selectedName);
+            loadFromDB();
+            modal.close();
+        });
+        return modal;
+    }
+
+    public void showListView() {
+        createListView().show();
+    }
+
     public void setPickUpButtonClickEvent() {
         uiHandler.getPickUpButton().setOnAction(e -> {
             Player player = map.getPlayer();
@@ -123,20 +151,22 @@ public class Main extends Application {
     public void initModalSaveButtonClickEvent(Stage modal, Button saveButton, TextField nameField) {
         saveButton.setOnAction(e -> {
             String enteredName = nameField.getText();
-//            TODO: replace with dbManager usage
-//            List<PlayerModel> players = dbManager.getAllPlayers();
-            List<PlayerModel> players = new ArrayList<>();
+            Player currentPlayer = map.getPlayer();
+            currentPlayer.setName(enteredName);
+            List<PlayerModel> players = dbManager.getAllPlayers();
             for (PlayerModel player : players) {
                 if (enteredName.equals(player.getPlayerName())) {
                     boolean overwrite = uiHandler.createOverwriteAlert(enteredName);
                     if (overwrite) {
-                        // TODO: Overwrite save in db
+                        dbManager.deletePlayer(currentPlayer);
+                        dbManager.saveGameState(map, currentPlayer);
                         modal.close();
                     }
-                } else {
-                    // TODO: Create save in db
+                    return;
                 }
             }
+            dbManager.saveGameState(map, currentPlayer);
+            modal.close();
         });
     }
 
@@ -157,8 +187,11 @@ public class Main extends Application {
             case RIGHT:
                 dx = 1;
                 break;
-            case S:
-                dbManager.saveGameState(map, map.getPlayer());
+//            case S:
+//                dbManager.saveGameState(map, map.getPlayer());
+//                break;
+            case L:
+                showListView();
                 break;
             case R:
                 loadFromDB();
@@ -197,7 +230,8 @@ public class Main extends Application {
     }
 
     private void loadFromDB() {
-        PlayerModel model = dbManager.loadPlayer("Player");
+        Player currentPlayer = map.getPlayer();
+        PlayerModel model = dbManager.loadPlayer(currentPlayer.getName());
         GameState state = dbManager.loadGameState(model.getStateId(), model);
         map = state.getCurrentMap();
         Player player = new Player(map.getCell(model.getX(), model.getY()));

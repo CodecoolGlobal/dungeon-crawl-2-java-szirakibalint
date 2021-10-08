@@ -122,4 +122,16 @@ public class PlayerDaoJdbc implements PlayerDao {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void delete(String name) {
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "DELETE FROM player WHERE name = ?";
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setString(1, name);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

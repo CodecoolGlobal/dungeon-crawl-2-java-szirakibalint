@@ -9,4 +9,5 @@ public interface PlayerDao {
     void update(PlayerModel player);
     PlayerModel get(String name);
     List<PlayerModel> getAll();
+    void delete(String name);
 }

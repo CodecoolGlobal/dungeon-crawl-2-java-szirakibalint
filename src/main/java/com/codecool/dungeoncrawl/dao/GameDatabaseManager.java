@@ -50,6 +50,10 @@ public class GameDatabaseManager {
         return playerDao.getAll();
     }
 
+    public void deletePlayer(Player player) {
+        playerDao.delete(player.getName());
+    }
+
     private DataSource connect() throws SQLException {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         String dbName = System.getenv("PSQL_DB_NAME");
